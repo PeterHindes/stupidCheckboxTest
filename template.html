@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Checkbox</title>
+    <style>
+        body {
+            margin: 10px;
+            min-width: calc(456px+20px);
+        }
+        #content {
+            margin: 0 auto;
+            /* width: 400px; */
+            width: fit-content;
+            min-width: 416px;
+            background-color: beige;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .row {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 19px;
+        }
+        input[type="checkbox"] {
+            padding: 0;
+            margin: 2px;
+        }
+
+        #counter {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            background-color: lightblue;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100px;
+            text-align: center;
+        }
+
+        :root {
+            --row-height: 19px;
+            --offsetRows: 0;
+        }
+
+        .filled {
+            transform: translate3d(0,calc(var(--offsetRows) * var(--row-height)),0);
+        }
+
+        #filler {
+            height: calc(var(--row-height) * 49900);
+        }
+    </style>
+</head>
+<body>
+    <h1>this is stupid</h1>
+    <div id="content">
+        {{checkbox}}
+        <div id="filler"></div>
+    </div>
+    <div id="counter">0</div>
+    <script>
+        var rowsScrolled = 0;
+        // move the ckeckboxes down with the viewport and update a variable with the number of rows scrolled past the first row
+        window.onscroll = function() {
+            var rows = document.getElementsByClassName("row");
+            var row = rows[0];
+            var rowHeight = row.offsetHeight;
+            var rowTop = row.offsetTop;
+            var rowBottom = rowTop + rowHeight;
+            rowsScrolled = Math.max(0, Math.floor((window.scrollY - rowTop) / rowHeight));
+            // set the css transform property of all rows to move them down
+            document.documentElement.style.setProperty("--offsetRows", rowsScrolled);
+            var counter = document.getElementById("counter");
+            counter.innerHTML = rowsScrolled;
+            updateCheckBoxes();
+        }
+
+        // store the boolean state of all 1 million checkboxes
+        var checkStates = new Array(1000000).fill(false);
+
+        // handle updating the checkBoxes in the dom when the user scrolls
+        function updateCheckBoxes() {
+            for (var i = 0; i < 2000; i++) {
+                var box = document.getElementById(`checkbox${i}`);
+                box.checked = checkStates[i + rowsScrolled*20];
+            }
+        }
+
+        function handleBox(id) {
+            var box = document.getElementById(`checkbox${id}`);
+            console.log(id+rowsScrolled*20,box.checked);
+            checkStates[id+rowsScrolled*20] = box.checked;
+        }
+    </script>
+</body>
+</html>
