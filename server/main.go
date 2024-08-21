@@ -7,7 +7,8 @@ import (
 	"image/png"
 	"math/rand"
 	"os"
-	"time"
+	_"time"
+	"math"
 )
 
 
@@ -52,11 +53,11 @@ func main() {
 	// elapsed := time.Since(start)
 	// fmt.Println("Elapsed time:", elapsed)
 
-	encodeddiff := blankRunEncode(arraydiff, 53)
+	encodeddiff := blankRunEncode(arraydiff, 6)
 
 	// Save to binary file
 	saveBinaryFile(arraydiff, "diff.bin")
-	// saveBinaryFile(encodeddiff, "ediff.bin")
+	saveBinaryFile(encodeddiff, "ediff.bin")
 
 	// // Print the rle encoded arrays
 	// printRle("Negative Differences", encodednegdiff)
@@ -184,15 +185,8 @@ func saveImage(img image.Image, filename string) {
 	}
 }
 
-// New encoding function
-// this encoding will take a boolean array that includes all the flips
-// the encoding will be as follows:
-// [number of zeros (no flip) as 7 bits][positive or negative change as 1 bit where a zero is no change and a one is a change] repeat until end of array to encode
-// this encoding will be done in a new array but the array will not be aligned with the input array and will instead be a series that conforms to the encoding
-
-// First we will record the lengths of runs in an int array
-// then we will convert the runs to the encoding
-func blankRunEncode(array []bool, average float64) []bool {
+// Custom RLE encoding function
+func blankRunEncode(array []bool, powerOfTwo int) []bool {
 	// Calculate the length of array
 	arraySize := len(array)
 	// Create a new array for the runs
@@ -212,80 +206,13 @@ func blankRunEncode(array []bool, average float64) []bool {
 			ends = append(ends, array[i])
 		}
 	}
-
-
-	// fmt.Println("Runs:", runs[:10])
-	// fmt.Println("Ends:", ends[:10])
-
-
-	// // Find the average run length
-	// total := 0
-	// for i := 0; i < len(runs); i++ {
-	// 	total += runs[i]
-	// }
-	// average := float64(total) / float64(len(runs))
-	// fmt.Println("Average run length:", average)
-
-	// // Actually lets try making the "average" the max run length
-	// // Find the max run length
-	// maxRun := 0
-	// for i := 0; i < len(runs); i++ {
-	// 	if runs[i] > maxRun {
-	// 		maxRun = runs[i]
-	// 	}
-	// }
-
-	// average := float64(maxRun)
-	// fmt.Println("Max run length:", average)
-
-	// // Actually lets make the "average" the value where 90% of the runs are shorter
-	// // make an array of ints where each index represents a power of two and the value is the number of runs that are that length or shorter
-	// // we have 20 buckets because the max run length is 1 million
-	// buckets := make([]int, 20)
-	// average := 0.0
-	// for i := 0; i < len(runs); i++ {
-	// 	for j := 0; j < len(buckets); j++ {
-	// 		if runs[i] <= int(math.Pow(2, float64(j))) {
-	// 			buckets[j]++
-	// 		}
-	// 	}
-	// }
-	// // print buckets and what their power of two is
-	// for i := 0; i < len(buckets); i++ {
-	// 	fmt.Println("Power of two:", i, "Number of runs:", buckets[i])
-	// }
-
-	// // find the bucket where 99% of the runs are shorter
-	// total := 0
-	// for i := 0; i < len(buckets); i++ {
-	// 	total += buckets[i]
-	// 	if total >= len(runs)*99/100 {
-	// 		fmt.Println("99% of runs are shorter than power of two:", i)
-	// 		average = math.Pow(2, float64(i))
-	// 		break
-	// 	}
-	// }
-
-	// Actually lets make the "average" the max number a run could be, 1 million
-	// average := 1000000.0
-
-
-	// Find the nearest power of two to the average
-	lastPower := 1.0
-	power := 2.0
-	for power < average {
-		lastPower = power
-		power *= 2
+	// Handle the case where the last run is a zero run
+	if run > 0 {
+		runs = append(runs, run-1)
+		ends = append(ends, false)
 	}
-	if (average - lastPower) < (power - average) {
-		power = lastPower
-	}
-	powerInt := int(power)
-	// fmt.Println("Nearest power of two:", powerInt)
-	
-	// convert the powerInt to an int representing the power of two
-	powerOfTwo := int(math.Log2(float64(powerInt)))
-	// fmt.Println("Power of two:", powerOfTwo)
+
+	powerInt := int(math.Pow(2, float64(powerOfTwo)))
 
 	// Split runs longer than nearest power of two into multiple runs (the first of witch must have and end of false and the second stays true)
 	// This requires looping through the runs array and checking if the run is longer than the power of two
@@ -293,16 +220,13 @@ func blankRunEncode(array []bool, average float64) []bool {
 	newRuns := make([]int, 0)
 	newEnds := make([]bool, 0)
 	for i := 0; i < len(runs); i++ {
-		newestRuns, newestEnds := splitByPowerOfTwo(runs[i], powerInt)
+		newestRuns, newestEnds := splitByPowerOfTwo(runs[i], powerInt, ends[i])
 		newRuns = append(newRuns, newestRuns...)
 		newEnds = append(newEnds, newestEnds...)
 	}
 
 
 	// From below just encodes using the powerOfTwo and the newRuns and newEnds arrays
-
-	// fmt.Println("New Runs:", newRuns[:10])
-	// fmt.Println("New Ends:", newEnds[:10])
 
 	// Create a new array for the change encoding
 	// first 5 bits used to store the power of two we are using for max run length
@@ -313,7 +237,7 @@ func blankRunEncode(array []bool, average float64) []bool {
 
 	// convert the power of two to a boolean array and append them to the encoded array
 	// 5 bits
-	for j := 0; j < 5; j++ {
+	for j := 4; j >= 0; j-- {
 		encoded = append(encoded, (powerOfTwo>>j)&1 == 1)
 	}
 
@@ -334,38 +258,18 @@ func blankRunEncode(array []bool, average float64) []bool {
 	// fmt.Println("Original array size:", arraySize)
 	// fmt.Println("Encoded array size:  ", len(encoded))
 
-	fmt.Println("f", average, " ")
+
+	
 
 	return encoded
 
-	// Show the first 25 runs of the encoded array
-	// fmt.Println("First 25 bits of the encoded array:")
-	// fmt.Println("")
-	// for i := 0; i < len(encoded); i++ {
-	// 	if i == 5 {
-	// 		fmt.Print(" ")
-	// 	}
-	// 	if ((i-5) % (powerOfTwo+1)) == 0 && i >= 5 {
-	// 		fmt.Print(" ")
-	// 	}
-		
-	// 	if encoded[i] {
-	// 		fmt.Print("1")
-	// 	} else {
-	// 		fmt.Print("0")
-	// 	}
-
-	// 	if ((i-5-3) % (powerOfTwo+1)) == 0 && i >= 8 {
-	// 		fmt.Print(" ")
-	// 	}
-	// }
 }
 
 // Recursive function to split a run into multiple runs
-func splitByPowerOfTwo(run int, power int) ([]int, []bool) {
+func splitByPowerOfTwo(run, power int, end bool) ([]int, []bool) {
 	// Check if the run is smaller than the power of two
 	if run <= power {
-		return []int{run}, []bool{true}
+		return []int{run}, []bool{end}
 	}
 
 	// Split the run into two
@@ -373,9 +277,49 @@ func splitByPowerOfTwo(run int, power int) ([]int, []bool) {
 	ends := make([]bool, 0)
 	runs = append(runs, power-1)
 	ends = append(ends, false)
-	newRuns, newEnds := splitByPowerOfTwo(run-power+1, power)
+	newRuns, newEnds := splitByPowerOfTwo(run-power+1, power, end)
 	runs = append(runs, newRuns...)
 	ends = append(ends, newEnds...)
 
 	return runs, ends
+}
+
+// Print the RLE encoded array
+func printRle(array []bool) {
+	// Calculate the power of two
+	powerOfTwo := 0
+	for i := 4; i >= 0; i-- {
+		if array[i] {
+			powerOfTwo += 1 << uint(i)
+		}
+	}
+
+	fmt.Println("The power of two:", powerOfTwo)
+	fmt.Println("The encoded array:")
+	for i := 0; i < len(array); i++ {
+
+		bodyPos := i - 5
+		runPos := bodyPos % (powerOfTwo+1)
+
+		// Put a space after the bits that represent the encoding length
+		if bodyPos == 0 {
+			fmt.Print("_")
+		}
+		// Put a space after the bits that represent the encoding length
+		if (runPos == 0 && bodyPos > 0) {
+			fmt.Print(" ")
+		}
+		// Put a dash after the bits that represent the runs length before the bit that represents how the run ends
+		if (runPos == powerOfTwo && bodyPos > 0) {
+			fmt.Print("-")
+		}
+		
+		if array[i] {
+			fmt.Print("1")
+		} else {
+			fmt.Print("0")
+		}
+	}
+	fmt.Println("")
+
 }
