@@ -111,6 +111,14 @@ func main() {
 
 		os.Exit(0)
 	}()
+	// Also save every 5 seconds
+	go func() {
+		for {
+			time.Sleep(5 * time.Second)
+			saveBinaryFile(bitArray[:], "bitArray.bin")
+			log.Println("BitArray saved to bitArray.bin")
+		}
+	}()
 
 	// Register WebSocket handler
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
