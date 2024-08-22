@@ -202,7 +202,7 @@
             }
         }
 
-        
+
         function getWsUrl() {
             var proto = window.location.protocol
             var wsproto = proto === "https:" ? "wss:" : "ws:";
@@ -215,9 +215,19 @@
         var wsurl = getWsUrl();
 
         var ws = null;
-        var messageQueue = [];
+        var messageQueue = JSON.parse(localStorage.getItem("messageQueue")) || [];
+
+        function saveMessageQueue() {
+            localStorage.setItem("messageQueue", JSON.stringify(messageQueue));
+        }
+
+        window.addEventListener("beforeunload", function() {
+            saveMessageQueue();
+        });
         // retry should be a callback function to rerun after the websocket is opened
         function openWebsocket() {
+            console.log("Opening websocket");
+            
             if (ws === null || ws.readyState === 3) {
                 ws = new WebSocket(wsurl);
                 ws.binaryType = "arraybuffer";
@@ -253,7 +263,7 @@
                 }
                 ws.onclose = function() {
                     console.log("Websocket closed");
-                    openWebsocket();
+                    setTimeout(openWebsocket, 1000);
                 }
             } else if (ws.readyState === 0) {
                 console.log("Websocket not open yet");
@@ -268,6 +278,7 @@
                     var message = messageQueue.shift();
                     ws.send(JSON.stringify(message));
                 }
+                console.log("Sent all messages");
             }
         }
 
@@ -279,9 +290,11 @@
 
             // Send the state of the checkbox to the server
             messageQueue.push({id: inx, state: box.checked});
+            
             sendMessages();
 
             console.log("Set box",id,"To",box.checked,"from index",inx);
+            
         }
     </script>
 </body>
