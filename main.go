@@ -28,11 +28,13 @@ func main() {
         return
     }
 
-    // Generate 10,000 checkbox inputs
+    // Generate 2000 checkboxes
+    const rowLength = 20
+    const rows = 100
     var checkboxes strings.Builder
-	for j := 0; j < 100; j++ {
-		checkboxes.WriteString(fmt.Sprintf(`<div id="row%d" class="row filled" >`, j))
-		for i := 0; i < 20; i++ {
+	for j := 0; j < rows; j++ {
+		checkboxes.WriteString(fmt.Sprintf(`<div id="row%d" class="row" >`, j))
+		for i := 0; i < rowLength; i++ {
 			var inx = 20*j + i
 			checkboxes.WriteString(fmt.Sprintf(
 				`<input type="checkbox" id="checkbox%d" name="checkbox%d" onclick="handleBox(%d)"></input>
@@ -41,11 +43,6 @@ func main() {
 		}
 		checkboxes.WriteString("</div>")
     }
-
-	// for j := 0; j < (1000000-100*20)/20; j++ {
-	// 	checkboxes.WriteString(fmt.Sprintf(`<div id="row%d" class="row" >`, j))
-	// 	checkboxes.WriteString("</div>")
-	// }
 
     // Replace the marker with the generated checkboxes
     modifiedContent := strings.Replace(htmlContent, marker, checkboxes.String(), 1)
@@ -57,5 +54,5 @@ func main() {
         return
     }
 
-    fmt.Println("Successfully inserted 10,000 checkboxes into the HTML file")
+    fmt.Println("Successfully inserted", rowLength*rows,"checkboxes into the HTML file using", rows, "rows and", rowLength, "columns")
 }

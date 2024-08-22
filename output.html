@@ -9,25 +9,36 @@
             margin: 10px;
             min-width: calc(456px+20px);
         }
+        #flexCenter {
+            min-width: 540px;
+            display: flex;
+            justify-content: center;
+        }
         #content {
-            margin: 0 auto;
-            /* width: 400px; */
-            width: fit-content;
-            min-width: 416px;
+            margin: 0;
+            width: 480px;
             background-color: beige;
             padding: 20px;
             border-radius: 10px;
+        }
+        #clipper {
+            overflow: hidden;
+            width: calc(var(--checkboxWidth) * 20);
+            padding: 0;
+            margin: 0;
         }
         .row {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 19px;
+            overflow: hidden;
+            text-overflow: clip;
         }
-        input[type="checkbox"] {
+        /* input[type="checkbox"] {
             padding: 0;
             margin: 2px;
-        }
+        } */
 
         #counter {
             position: fixed;
@@ -43,21 +54,34 @@
         :root {
             --row-height: 19px;
             --offsetRows: 0;
+            /* --directTranslate: 0; */
+            /* --topRowPos: 0px; */
+            --checkboxWidth: 20px;
         }
 
-        .filled {
-            transform: translate3d(0,calc(var(--offsetRows) * var(--row-height)),0);
+        #mover {
+            /* transform: translate3d(0,calc(var(--offsetRows) * var(--row-height)),0); */
+            /* transform: translate3d(0,var(--directTranslate),0); */
+            position: sticky;
+            top: 0px;
+            padding: 0;
+            margin: 0;
         }
 
         #filler {
             height: calc(var(--row-height) * 49900);
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>
 <body>
     <h1>this is stupid</h1>
-    <div id="content">
-        <div id="row0" class="row filled" ><input type="checkbox" id="checkbox0" name="checkbox0" onclick="handleBox(0)"></input>
+    <div id="flexCenter">
+        <div id="content">
+            <div id="clipper">
+                <div id="mover">
+                    <div id="row0" class="row" ><input type="checkbox" id="checkbox0" name="checkbox0" onclick="handleBox(0)"></input>
 				<input type="checkbox" id="checkbox1" name="checkbox1" onclick="handleBox(1)"></input>
 				<input type="checkbox" id="checkbox2" name="checkbox2" onclick="handleBox(2)"></input>
 				<input type="checkbox" id="checkbox3" name="checkbox3" onclick="handleBox(3)"></input>
@@ -77,7 +101,7 @@
 				<input type="checkbox" id="checkbox17" name="checkbox17" onclick="handleBox(17)"></input>
 				<input type="checkbox" id="checkbox18" name="checkbox18" onclick="handleBox(18)"></input>
 				<input type="checkbox" id="checkbox19" name="checkbox19" onclick="handleBox(19)"></input>
-				</div><div id="row1" class="row filled" ><input type="checkbox" id="checkbox20" name="checkbox20" onclick="handleBox(20)"></input>
+				</div><div id="row1" class="row" ><input type="checkbox" id="checkbox20" name="checkbox20" onclick="handleBox(20)"></input>
 				<input type="checkbox" id="checkbox21" name="checkbox21" onclick="handleBox(21)"></input>
 				<input type="checkbox" id="checkbox22" name="checkbox22" onclick="handleBox(22)"></input>
 				<input type="checkbox" id="checkbox23" name="checkbox23" onclick="handleBox(23)"></input>
@@ -97,7 +121,7 @@
 				<input type="checkbox" id="checkbox37" name="checkbox37" onclick="handleBox(37)"></input>
 				<input type="checkbox" id="checkbox38" name="checkbox38" onclick="handleBox(38)"></input>
 				<input type="checkbox" id="checkbox39" name="checkbox39" onclick="handleBox(39)"></input>
-				</div><div id="row2" class="row filled" ><input type="checkbox" id="checkbox40" name="checkbox40" onclick="handleBox(40)"></input>
+				</div><div id="row2" class="row" ><input type="checkbox" id="checkbox40" name="checkbox40" onclick="handleBox(40)"></input>
 				<input type="checkbox" id="checkbox41" name="checkbox41" onclick="handleBox(41)"></input>
 				<input type="checkbox" id="checkbox42" name="checkbox42" onclick="handleBox(42)"></input>
 				<input type="checkbox" id="checkbox43" name="checkbox43" onclick="handleBox(43)"></input>
@@ -117,7 +141,7 @@
 				<input type="checkbox" id="checkbox57" name="checkbox57" onclick="handleBox(57)"></input>
 				<input type="checkbox" id="checkbox58" name="checkbox58" onclick="handleBox(58)"></input>
 				<input type="checkbox" id="checkbox59" name="checkbox59" onclick="handleBox(59)"></input>
-				</div><div id="row3" class="row filled" ><input type="checkbox" id="checkbox60" name="checkbox60" onclick="handleBox(60)"></input>
+				</div><div id="row3" class="row" ><input type="checkbox" id="checkbox60" name="checkbox60" onclick="handleBox(60)"></input>
 				<input type="checkbox" id="checkbox61" name="checkbox61" onclick="handleBox(61)"></input>
 				<input type="checkbox" id="checkbox62" name="checkbox62" onclick="handleBox(62)"></input>
 				<input type="checkbox" id="checkbox63" name="checkbox63" onclick="handleBox(63)"></input>
@@ -137,7 +161,7 @@
 				<input type="checkbox" id="checkbox77" name="checkbox77" onclick="handleBox(77)"></input>
 				<input type="checkbox" id="checkbox78" name="checkbox78" onclick="handleBox(78)"></input>
 				<input type="checkbox" id="checkbox79" name="checkbox79" onclick="handleBox(79)"></input>
-				</div><div id="row4" class="row filled" ><input type="checkbox" id="checkbox80" name="checkbox80" onclick="handleBox(80)"></input>
+				</div><div id="row4" class="row" ><input type="checkbox" id="checkbox80" name="checkbox80" onclick="handleBox(80)"></input>
 				<input type="checkbox" id="checkbox81" name="checkbox81" onclick="handleBox(81)"></input>
 				<input type="checkbox" id="checkbox82" name="checkbox82" onclick="handleBox(82)"></input>
 				<input type="checkbox" id="checkbox83" name="checkbox83" onclick="handleBox(83)"></input>
@@ -157,7 +181,7 @@
 				<input type="checkbox" id="checkbox97" name="checkbox97" onclick="handleBox(97)"></input>
 				<input type="checkbox" id="checkbox98" name="checkbox98" onclick="handleBox(98)"></input>
 				<input type="checkbox" id="checkbox99" name="checkbox99" onclick="handleBox(99)"></input>
-				</div><div id="row5" class="row filled" ><input type="checkbox" id="checkbox100" name="checkbox100" onclick="handleBox(100)"></input>
+				</div><div id="row5" class="row" ><input type="checkbox" id="checkbox100" name="checkbox100" onclick="handleBox(100)"></input>
 				<input type="checkbox" id="checkbox101" name="checkbox101" onclick="handleBox(101)"></input>
 				<input type="checkbox" id="checkbox102" name="checkbox102" onclick="handleBox(102)"></input>
 				<input type="checkbox" id="checkbox103" name="checkbox103" onclick="handleBox(103)"></input>
@@ -177,7 +201,7 @@
 				<input type="checkbox" id="checkbox117" name="checkbox117" onclick="handleBox(117)"></input>
 				<input type="checkbox" id="checkbox118" name="checkbox118" onclick="handleBox(118)"></input>
 				<input type="checkbox" id="checkbox119" name="checkbox119" onclick="handleBox(119)"></input>
-				</div><div id="row6" class="row filled" ><input type="checkbox" id="checkbox120" name="checkbox120" onclick="handleBox(120)"></input>
+				</div><div id="row6" class="row" ><input type="checkbox" id="checkbox120" name="checkbox120" onclick="handleBox(120)"></input>
 				<input type="checkbox" id="checkbox121" name="checkbox121" onclick="handleBox(121)"></input>
 				<input type="checkbox" id="checkbox122" name="checkbox122" onclick="handleBox(122)"></input>
 				<input type="checkbox" id="checkbox123" name="checkbox123" onclick="handleBox(123)"></input>
@@ -197,7 +221,7 @@
 				<input type="checkbox" id="checkbox137" name="checkbox137" onclick="handleBox(137)"></input>
 				<input type="checkbox" id="checkbox138" name="checkbox138" onclick="handleBox(138)"></input>
 				<input type="checkbox" id="checkbox139" name="checkbox139" onclick="handleBox(139)"></input>
-				</div><div id="row7" class="row filled" ><input type="checkbox" id="checkbox140" name="checkbox140" onclick="handleBox(140)"></input>
+				</div><div id="row7" class="row" ><input type="checkbox" id="checkbox140" name="checkbox140" onclick="handleBox(140)"></input>
 				<input type="checkbox" id="checkbox141" name="checkbox141" onclick="handleBox(141)"></input>
 				<input type="checkbox" id="checkbox142" name="checkbox142" onclick="handleBox(142)"></input>
 				<input type="checkbox" id="checkbox143" name="checkbox143" onclick="handleBox(143)"></input>
@@ -217,7 +241,7 @@
 				<input type="checkbox" id="checkbox157" name="checkbox157" onclick="handleBox(157)"></input>
 				<input type="checkbox" id="checkbox158" name="checkbox158" onclick="handleBox(158)"></input>
 				<input type="checkbox" id="checkbox159" name="checkbox159" onclick="handleBox(159)"></input>
-				</div><div id="row8" class="row filled" ><input type="checkbox" id="checkbox160" name="checkbox160" onclick="handleBox(160)"></input>
+				</div><div id="row8" class="row" ><input type="checkbox" id="checkbox160" name="checkbox160" onclick="handleBox(160)"></input>
 				<input type="checkbox" id="checkbox161" name="checkbox161" onclick="handleBox(161)"></input>
 				<input type="checkbox" id="checkbox162" name="checkbox162" onclick="handleBox(162)"></input>
 				<input type="checkbox" id="checkbox163" name="checkbox163" onclick="handleBox(163)"></input>
@@ -237,7 +261,7 @@
 				<input type="checkbox" id="checkbox177" name="checkbox177" onclick="handleBox(177)"></input>
 				<input type="checkbox" id="checkbox178" name="checkbox178" onclick="handleBox(178)"></input>
 				<input type="checkbox" id="checkbox179" name="checkbox179" onclick="handleBox(179)"></input>
-				</div><div id="row9" class="row filled" ><input type="checkbox" id="checkbox180" name="checkbox180" onclick="handleBox(180)"></input>
+				</div><div id="row9" class="row" ><input type="checkbox" id="checkbox180" name="checkbox180" onclick="handleBox(180)"></input>
 				<input type="checkbox" id="checkbox181" name="checkbox181" onclick="handleBox(181)"></input>
 				<input type="checkbox" id="checkbox182" name="checkbox182" onclick="handleBox(182)"></input>
 				<input type="checkbox" id="checkbox183" name="checkbox183" onclick="handleBox(183)"></input>
@@ -257,7 +281,7 @@
 				<input type="checkbox" id="checkbox197" name="checkbox197" onclick="handleBox(197)"></input>
 				<input type="checkbox" id="checkbox198" name="checkbox198" onclick="handleBox(198)"></input>
 				<input type="checkbox" id="checkbox199" name="checkbox199" onclick="handleBox(199)"></input>
-				</div><div id="row10" class="row filled" ><input type="checkbox" id="checkbox200" name="checkbox200" onclick="handleBox(200)"></input>
+				</div><div id="row10" class="row" ><input type="checkbox" id="checkbox200" name="checkbox200" onclick="handleBox(200)"></input>
 				<input type="checkbox" id="checkbox201" name="checkbox201" onclick="handleBox(201)"></input>
 				<input type="checkbox" id="checkbox202" name="checkbox202" onclick="handleBox(202)"></input>
 				<input type="checkbox" id="checkbox203" name="checkbox203" onclick="handleBox(203)"></input>
@@ -277,7 +301,7 @@
 				<input type="checkbox" id="checkbox217" name="checkbox217" onclick="handleBox(217)"></input>
 				<input type="checkbox" id="checkbox218" name="checkbox218" onclick="handleBox(218)"></input>
 				<input type="checkbox" id="checkbox219" name="checkbox219" onclick="handleBox(219)"></input>
-				</div><div id="row11" class="row filled" ><input type="checkbox" id="checkbox220" name="checkbox220" onclick="handleBox(220)"></input>
+				</div><div id="row11" class="row" ><input type="checkbox" id="checkbox220" name="checkbox220" onclick="handleBox(220)"></input>
 				<input type="checkbox" id="checkbox221" name="checkbox221" onclick="handleBox(221)"></input>
 				<input type="checkbox" id="checkbox222" name="checkbox222" onclick="handleBox(222)"></input>
 				<input type="checkbox" id="checkbox223" name="checkbox223" onclick="handleBox(223)"></input>
@@ -297,7 +321,7 @@
 				<input type="checkbox" id="checkbox237" name="checkbox237" onclick="handleBox(237)"></input>
 				<input type="checkbox" id="checkbox238" name="checkbox238" onclick="handleBox(238)"></input>
 				<input type="checkbox" id="checkbox239" name="checkbox239" onclick="handleBox(239)"></input>
-				</div><div id="row12" class="row filled" ><input type="checkbox" id="checkbox240" name="checkbox240" onclick="handleBox(240)"></input>
+				</div><div id="row12" class="row" ><input type="checkbox" id="checkbox240" name="checkbox240" onclick="handleBox(240)"></input>
 				<input type="checkbox" id="checkbox241" name="checkbox241" onclick="handleBox(241)"></input>
 				<input type="checkbox" id="checkbox242" name="checkbox242" onclick="handleBox(242)"></input>
 				<input type="checkbox" id="checkbox243" name="checkbox243" onclick="handleBox(243)"></input>
@@ -317,7 +341,7 @@
 				<input type="checkbox" id="checkbox257" name="checkbox257" onclick="handleBox(257)"></input>
 				<input type="checkbox" id="checkbox258" name="checkbox258" onclick="handleBox(258)"></input>
 				<input type="checkbox" id="checkbox259" name="checkbox259" onclick="handleBox(259)"></input>
-				</div><div id="row13" class="row filled" ><input type="checkbox" id="checkbox260" name="checkbox260" onclick="handleBox(260)"></input>
+				</div><div id="row13" class="row" ><input type="checkbox" id="checkbox260" name="checkbox260" onclick="handleBox(260)"></input>
 				<input type="checkbox" id="checkbox261" name="checkbox261" onclick="handleBox(261)"></input>
 				<input type="checkbox" id="checkbox262" name="checkbox262" onclick="handleBox(262)"></input>
 				<input type="checkbox" id="checkbox263" name="checkbox263" onclick="handleBox(263)"></input>
@@ -337,7 +361,7 @@
 				<input type="checkbox" id="checkbox277" name="checkbox277" onclick="handleBox(277)"></input>
 				<input type="checkbox" id="checkbox278" name="checkbox278" onclick="handleBox(278)"></input>
 				<input type="checkbox" id="checkbox279" name="checkbox279" onclick="handleBox(279)"></input>
-				</div><div id="row14" class="row filled" ><input type="checkbox" id="checkbox280" name="checkbox280" onclick="handleBox(280)"></input>
+				</div><div id="row14" class="row" ><input type="checkbox" id="checkbox280" name="checkbox280" onclick="handleBox(280)"></input>
 				<input type="checkbox" id="checkbox281" name="checkbox281" onclick="handleBox(281)"></input>
 				<input type="checkbox" id="checkbox282" name="checkbox282" onclick="handleBox(282)"></input>
 				<input type="checkbox" id="checkbox283" name="checkbox283" onclick="handleBox(283)"></input>
@@ -357,7 +381,7 @@
 				<input type="checkbox" id="checkbox297" name="checkbox297" onclick="handleBox(297)"></input>
 				<input type="checkbox" id="checkbox298" name="checkbox298" onclick="handleBox(298)"></input>
 				<input type="checkbox" id="checkbox299" name="checkbox299" onclick="handleBox(299)"></input>
-				</div><div id="row15" class="row filled" ><input type="checkbox" id="checkbox300" name="checkbox300" onclick="handleBox(300)"></input>
+				</div><div id="row15" class="row" ><input type="checkbox" id="checkbox300" name="checkbox300" onclick="handleBox(300)"></input>
 				<input type="checkbox" id="checkbox301" name="checkbox301" onclick="handleBox(301)"></input>
 				<input type="checkbox" id="checkbox302" name="checkbox302" onclick="handleBox(302)"></input>
 				<input type="checkbox" id="checkbox303" name="checkbox303" onclick="handleBox(303)"></input>
@@ -377,7 +401,7 @@
 				<input type="checkbox" id="checkbox317" name="checkbox317" onclick="handleBox(317)"></input>
 				<input type="checkbox" id="checkbox318" name="checkbox318" onclick="handleBox(318)"></input>
 				<input type="checkbox" id="checkbox319" name="checkbox319" onclick="handleBox(319)"></input>
-				</div><div id="row16" class="row filled" ><input type="checkbox" id="checkbox320" name="checkbox320" onclick="handleBox(320)"></input>
+				</div><div id="row16" class="row" ><input type="checkbox" id="checkbox320" name="checkbox320" onclick="handleBox(320)"></input>
 				<input type="checkbox" id="checkbox321" name="checkbox321" onclick="handleBox(321)"></input>
 				<input type="checkbox" id="checkbox322" name="checkbox322" onclick="handleBox(322)"></input>
 				<input type="checkbox" id="checkbox323" name="checkbox323" onclick="handleBox(323)"></input>
@@ -397,7 +421,7 @@
 				<input type="checkbox" id="checkbox337" name="checkbox337" onclick="handleBox(337)"></input>
 				<input type="checkbox" id="checkbox338" name="checkbox338" onclick="handleBox(338)"></input>
 				<input type="checkbox" id="checkbox339" name="checkbox339" onclick="handleBox(339)"></input>
-				</div><div id="row17" class="row filled" ><input type="checkbox" id="checkbox340" name="checkbox340" onclick="handleBox(340)"></input>
+				</div><div id="row17" class="row" ><input type="checkbox" id="checkbox340" name="checkbox340" onclick="handleBox(340)"></input>
 				<input type="checkbox" id="checkbox341" name="checkbox341" onclick="handleBox(341)"></input>
 				<input type="checkbox" id="checkbox342" name="checkbox342" onclick="handleBox(342)"></input>
 				<input type="checkbox" id="checkbox343" name="checkbox343" onclick="handleBox(343)"></input>
@@ -417,7 +441,7 @@
 				<input type="checkbox" id="checkbox357" name="checkbox357" onclick="handleBox(357)"></input>
 				<input type="checkbox" id="checkbox358" name="checkbox358" onclick="handleBox(358)"></input>
 				<input type="checkbox" id="checkbox359" name="checkbox359" onclick="handleBox(359)"></input>
-				</div><div id="row18" class="row filled" ><input type="checkbox" id="checkbox360" name="checkbox360" onclick="handleBox(360)"></input>
+				</div><div id="row18" class="row" ><input type="checkbox" id="checkbox360" name="checkbox360" onclick="handleBox(360)"></input>
 				<input type="checkbox" id="checkbox361" name="checkbox361" onclick="handleBox(361)"></input>
 				<input type="checkbox" id="checkbox362" name="checkbox362" onclick="handleBox(362)"></input>
 				<input type="checkbox" id="checkbox363" name="checkbox363" onclick="handleBox(363)"></input>
@@ -437,7 +461,7 @@
 				<input type="checkbox" id="checkbox377" name="checkbox377" onclick="handleBox(377)"></input>
 				<input type="checkbox" id="checkbox378" name="checkbox378" onclick="handleBox(378)"></input>
 				<input type="checkbox" id="checkbox379" name="checkbox379" onclick="handleBox(379)"></input>
-				</div><div id="row19" class="row filled" ><input type="checkbox" id="checkbox380" name="checkbox380" onclick="handleBox(380)"></input>
+				</div><div id="row19" class="row" ><input type="checkbox" id="checkbox380" name="checkbox380" onclick="handleBox(380)"></input>
 				<input type="checkbox" id="checkbox381" name="checkbox381" onclick="handleBox(381)"></input>
 				<input type="checkbox" id="checkbox382" name="checkbox382" onclick="handleBox(382)"></input>
 				<input type="checkbox" id="checkbox383" name="checkbox383" onclick="handleBox(383)"></input>
@@ -457,7 +481,7 @@
 				<input type="checkbox" id="checkbox397" name="checkbox397" onclick="handleBox(397)"></input>
 				<input type="checkbox" id="checkbox398" name="checkbox398" onclick="handleBox(398)"></input>
 				<input type="checkbox" id="checkbox399" name="checkbox399" onclick="handleBox(399)"></input>
-				</div><div id="row20" class="row filled" ><input type="checkbox" id="checkbox400" name="checkbox400" onclick="handleBox(400)"></input>
+				</div><div id="row20" class="row" ><input type="checkbox" id="checkbox400" name="checkbox400" onclick="handleBox(400)"></input>
 				<input type="checkbox" id="checkbox401" name="checkbox401" onclick="handleBox(401)"></input>
 				<input type="checkbox" id="checkbox402" name="checkbox402" onclick="handleBox(402)"></input>
 				<input type="checkbox" id="checkbox403" name="checkbox403" onclick="handleBox(403)"></input>
@@ -477,7 +501,7 @@
 				<input type="checkbox" id="checkbox417" name="checkbox417" onclick="handleBox(417)"></input>
 				<input type="checkbox" id="checkbox418" name="checkbox418" onclick="handleBox(418)"></input>
 				<input type="checkbox" id="checkbox419" name="checkbox419" onclick="handleBox(419)"></input>
-				</div><div id="row21" class="row filled" ><input type="checkbox" id="checkbox420" name="checkbox420" onclick="handleBox(420)"></input>
+				</div><div id="row21" class="row" ><input type="checkbox" id="checkbox420" name="checkbox420" onclick="handleBox(420)"></input>
 				<input type="checkbox" id="checkbox421" name="checkbox421" onclick="handleBox(421)"></input>
 				<input type="checkbox" id="checkbox422" name="checkbox422" onclick="handleBox(422)"></input>
 				<input type="checkbox" id="checkbox423" name="checkbox423" onclick="handleBox(423)"></input>
@@ -497,7 +521,7 @@
 				<input type="checkbox" id="checkbox437" name="checkbox437" onclick="handleBox(437)"></input>
 				<input type="checkbox" id="checkbox438" name="checkbox438" onclick="handleBox(438)"></input>
 				<input type="checkbox" id="checkbox439" name="checkbox439" onclick="handleBox(439)"></input>
-				</div><div id="row22" class="row filled" ><input type="checkbox" id="checkbox440" name="checkbox440" onclick="handleBox(440)"></input>
+				</div><div id="row22" class="row" ><input type="checkbox" id="checkbox440" name="checkbox440" onclick="handleBox(440)"></input>
 				<input type="checkbox" id="checkbox441" name="checkbox441" onclick="handleBox(441)"></input>
 				<input type="checkbox" id="checkbox442" name="checkbox442" onclick="handleBox(442)"></input>
 				<input type="checkbox" id="checkbox443" name="checkbox443" onclick="handleBox(443)"></input>
@@ -517,7 +541,7 @@
 				<input type="checkbox" id="checkbox457" name="checkbox457" onclick="handleBox(457)"></input>
 				<input type="checkbox" id="checkbox458" name="checkbox458" onclick="handleBox(458)"></input>
 				<input type="checkbox" id="checkbox459" name="checkbox459" onclick="handleBox(459)"></input>
-				</div><div id="row23" class="row filled" ><input type="checkbox" id="checkbox460" name="checkbox460" onclick="handleBox(460)"></input>
+				</div><div id="row23" class="row" ><input type="checkbox" id="checkbox460" name="checkbox460" onclick="handleBox(460)"></input>
 				<input type="checkbox" id="checkbox461" name="checkbox461" onclick="handleBox(461)"></input>
 				<input type="checkbox" id="checkbox462" name="checkbox462" onclick="handleBox(462)"></input>
 				<input type="checkbox" id="checkbox463" name="checkbox463" onclick="handleBox(463)"></input>
@@ -537,7 +561,7 @@
 				<input type="checkbox" id="checkbox477" name="checkbox477" onclick="handleBox(477)"></input>
 				<input type="checkbox" id="checkbox478" name="checkbox478" onclick="handleBox(478)"></input>
 				<input type="checkbox" id="checkbox479" name="checkbox479" onclick="handleBox(479)"></input>
-				</div><div id="row24" class="row filled" ><input type="checkbox" id="checkbox480" name="checkbox480" onclick="handleBox(480)"></input>
+				</div><div id="row24" class="row" ><input type="checkbox" id="checkbox480" name="checkbox480" onclick="handleBox(480)"></input>
 				<input type="checkbox" id="checkbox481" name="checkbox481" onclick="handleBox(481)"></input>
 				<input type="checkbox" id="checkbox482" name="checkbox482" onclick="handleBox(482)"></input>
 				<input type="checkbox" id="checkbox483" name="checkbox483" onclick="handleBox(483)"></input>
@@ -557,7 +581,7 @@
 				<input type="checkbox" id="checkbox497" name="checkbox497" onclick="handleBox(497)"></input>
 				<input type="checkbox" id="checkbox498" name="checkbox498" onclick="handleBox(498)"></input>
 				<input type="checkbox" id="checkbox499" name="checkbox499" onclick="handleBox(499)"></input>
-				</div><div id="row25" class="row filled" ><input type="checkbox" id="checkbox500" name="checkbox500" onclick="handleBox(500)"></input>
+				</div><div id="row25" class="row" ><input type="checkbox" id="checkbox500" name="checkbox500" onclick="handleBox(500)"></input>
 				<input type="checkbox" id="checkbox501" name="checkbox501" onclick="handleBox(501)"></input>
 				<input type="checkbox" id="checkbox502" name="checkbox502" onclick="handleBox(502)"></input>
 				<input type="checkbox" id="checkbox503" name="checkbox503" onclick="handleBox(503)"></input>
@@ -577,7 +601,7 @@
 				<input type="checkbox" id="checkbox517" name="checkbox517" onclick="handleBox(517)"></input>
 				<input type="checkbox" id="checkbox518" name="checkbox518" onclick="handleBox(518)"></input>
 				<input type="checkbox" id="checkbox519" name="checkbox519" onclick="handleBox(519)"></input>
-				</div><div id="row26" class="row filled" ><input type="checkbox" id="checkbox520" name="checkbox520" onclick="handleBox(520)"></input>
+				</div><div id="row26" class="row" ><input type="checkbox" id="checkbox520" name="checkbox520" onclick="handleBox(520)"></input>
 				<input type="checkbox" id="checkbox521" name="checkbox521" onclick="handleBox(521)"></input>
 				<input type="checkbox" id="checkbox522" name="checkbox522" onclick="handleBox(522)"></input>
 				<input type="checkbox" id="checkbox523" name="checkbox523" onclick="handleBox(523)"></input>
@@ -597,7 +621,7 @@
 				<input type="checkbox" id="checkbox537" name="checkbox537" onclick="handleBox(537)"></input>
 				<input type="checkbox" id="checkbox538" name="checkbox538" onclick="handleBox(538)"></input>
 				<input type="checkbox" id="checkbox539" name="checkbox539" onclick="handleBox(539)"></input>
-				</div><div id="row27" class="row filled" ><input type="checkbox" id="checkbox540" name="checkbox540" onclick="handleBox(540)"></input>
+				</div><div id="row27" class="row" ><input type="checkbox" id="checkbox540" name="checkbox540" onclick="handleBox(540)"></input>
 				<input type="checkbox" id="checkbox541" name="checkbox541" onclick="handleBox(541)"></input>
 				<input type="checkbox" id="checkbox542" name="checkbox542" onclick="handleBox(542)"></input>
 				<input type="checkbox" id="checkbox543" name="checkbox543" onclick="handleBox(543)"></input>
@@ -617,7 +641,7 @@
 				<input type="checkbox" id="checkbox557" name="checkbox557" onclick="handleBox(557)"></input>
 				<input type="checkbox" id="checkbox558" name="checkbox558" onclick="handleBox(558)"></input>
 				<input type="checkbox" id="checkbox559" name="checkbox559" onclick="handleBox(559)"></input>
-				</div><div id="row28" class="row filled" ><input type="checkbox" id="checkbox560" name="checkbox560" onclick="handleBox(560)"></input>
+				</div><div id="row28" class="row" ><input type="checkbox" id="checkbox560" name="checkbox560" onclick="handleBox(560)"></input>
 				<input type="checkbox" id="checkbox561" name="checkbox561" onclick="handleBox(561)"></input>
 				<input type="checkbox" id="checkbox562" name="checkbox562" onclick="handleBox(562)"></input>
 				<input type="checkbox" id="checkbox563" name="checkbox563" onclick="handleBox(563)"></input>
@@ -637,7 +661,7 @@
 				<input type="checkbox" id="checkbox577" name="checkbox577" onclick="handleBox(577)"></input>
 				<input type="checkbox" id="checkbox578" name="checkbox578" onclick="handleBox(578)"></input>
 				<input type="checkbox" id="checkbox579" name="checkbox579" onclick="handleBox(579)"></input>
-				</div><div id="row29" class="row filled" ><input type="checkbox" id="checkbox580" name="checkbox580" onclick="handleBox(580)"></input>
+				</div><div id="row29" class="row" ><input type="checkbox" id="checkbox580" name="checkbox580" onclick="handleBox(580)"></input>
 				<input type="checkbox" id="checkbox581" name="checkbox581" onclick="handleBox(581)"></input>
 				<input type="checkbox" id="checkbox582" name="checkbox582" onclick="handleBox(582)"></input>
 				<input type="checkbox" id="checkbox583" name="checkbox583" onclick="handleBox(583)"></input>
@@ -657,7 +681,7 @@
 				<input type="checkbox" id="checkbox597" name="checkbox597" onclick="handleBox(597)"></input>
 				<input type="checkbox" id="checkbox598" name="checkbox598" onclick="handleBox(598)"></input>
 				<input type="checkbox" id="checkbox599" name="checkbox599" onclick="handleBox(599)"></input>
-				</div><div id="row30" class="row filled" ><input type="checkbox" id="checkbox600" name="checkbox600" onclick="handleBox(600)"></input>
+				</div><div id="row30" class="row" ><input type="checkbox" id="checkbox600" name="checkbox600" onclick="handleBox(600)"></input>
 				<input type="checkbox" id="checkbox601" name="checkbox601" onclick="handleBox(601)"></input>
 				<input type="checkbox" id="checkbox602" name="checkbox602" onclick="handleBox(602)"></input>
 				<input type="checkbox" id="checkbox603" name="checkbox603" onclick="handleBox(603)"></input>
@@ -677,7 +701,7 @@
 				<input type="checkbox" id="checkbox617" name="checkbox617" onclick="handleBox(617)"></input>
 				<input type="checkbox" id="checkbox618" name="checkbox618" onclick="handleBox(618)"></input>
 				<input type="checkbox" id="checkbox619" name="checkbox619" onclick="handleBox(619)"></input>
-				</div><div id="row31" class="row filled" ><input type="checkbox" id="checkbox620" name="checkbox620" onclick="handleBox(620)"></input>
+				</div><div id="row31" class="row" ><input type="checkbox" id="checkbox620" name="checkbox620" onclick="handleBox(620)"></input>
 				<input type="checkbox" id="checkbox621" name="checkbox621" onclick="handleBox(621)"></input>
 				<input type="checkbox" id="checkbox622" name="checkbox622" onclick="handleBox(622)"></input>
 				<input type="checkbox" id="checkbox623" name="checkbox623" onclick="handleBox(623)"></input>
@@ -697,7 +721,7 @@
 				<input type="checkbox" id="checkbox637" name="checkbox637" onclick="handleBox(637)"></input>
 				<input type="checkbox" id="checkbox638" name="checkbox638" onclick="handleBox(638)"></input>
 				<input type="checkbox" id="checkbox639" name="checkbox639" onclick="handleBox(639)"></input>
-				</div><div id="row32" class="row filled" ><input type="checkbox" id="checkbox640" name="checkbox640" onclick="handleBox(640)"></input>
+				</div><div id="row32" class="row" ><input type="checkbox" id="checkbox640" name="checkbox640" onclick="handleBox(640)"></input>
 				<input type="checkbox" id="checkbox641" name="checkbox641" onclick="handleBox(641)"></input>
 				<input type="checkbox" id="checkbox642" name="checkbox642" onclick="handleBox(642)"></input>
 				<input type="checkbox" id="checkbox643" name="checkbox643" onclick="handleBox(643)"></input>
@@ -717,7 +741,7 @@
 				<input type="checkbox" id="checkbox657" name="checkbox657" onclick="handleBox(657)"></input>
 				<input type="checkbox" id="checkbox658" name="checkbox658" onclick="handleBox(658)"></input>
 				<input type="checkbox" id="checkbox659" name="checkbox659" onclick="handleBox(659)"></input>
-				</div><div id="row33" class="row filled" ><input type="checkbox" id="checkbox660" name="checkbox660" onclick="handleBox(660)"></input>
+				</div><div id="row33" class="row" ><input type="checkbox" id="checkbox660" name="checkbox660" onclick="handleBox(660)"></input>
 				<input type="checkbox" id="checkbox661" name="checkbox661" onclick="handleBox(661)"></input>
 				<input type="checkbox" id="checkbox662" name="checkbox662" onclick="handleBox(662)"></input>
 				<input type="checkbox" id="checkbox663" name="checkbox663" onclick="handleBox(663)"></input>
@@ -737,7 +761,7 @@
 				<input type="checkbox" id="checkbox677" name="checkbox677" onclick="handleBox(677)"></input>
 				<input type="checkbox" id="checkbox678" name="checkbox678" onclick="handleBox(678)"></input>
 				<input type="checkbox" id="checkbox679" name="checkbox679" onclick="handleBox(679)"></input>
-				</div><div id="row34" class="row filled" ><input type="checkbox" id="checkbox680" name="checkbox680" onclick="handleBox(680)"></input>
+				</div><div id="row34" class="row" ><input type="checkbox" id="checkbox680" name="checkbox680" onclick="handleBox(680)"></input>
 				<input type="checkbox" id="checkbox681" name="checkbox681" onclick="handleBox(681)"></input>
 				<input type="checkbox" id="checkbox682" name="checkbox682" onclick="handleBox(682)"></input>
 				<input type="checkbox" id="checkbox683" name="checkbox683" onclick="handleBox(683)"></input>
@@ -757,7 +781,7 @@
 				<input type="checkbox" id="checkbox697" name="checkbox697" onclick="handleBox(697)"></input>
 				<input type="checkbox" id="checkbox698" name="checkbox698" onclick="handleBox(698)"></input>
 				<input type="checkbox" id="checkbox699" name="checkbox699" onclick="handleBox(699)"></input>
-				</div><div id="row35" class="row filled" ><input type="checkbox" id="checkbox700" name="checkbox700" onclick="handleBox(700)"></input>
+				</div><div id="row35" class="row" ><input type="checkbox" id="checkbox700" name="checkbox700" onclick="handleBox(700)"></input>
 				<input type="checkbox" id="checkbox701" name="checkbox701" onclick="handleBox(701)"></input>
 				<input type="checkbox" id="checkbox702" name="checkbox702" onclick="handleBox(702)"></input>
 				<input type="checkbox" id="checkbox703" name="checkbox703" onclick="handleBox(703)"></input>
@@ -777,7 +801,7 @@
 				<input type="checkbox" id="checkbox717" name="checkbox717" onclick="handleBox(717)"></input>
 				<input type="checkbox" id="checkbox718" name="checkbox718" onclick="handleBox(718)"></input>
 				<input type="checkbox" id="checkbox719" name="checkbox719" onclick="handleBox(719)"></input>
-				</div><div id="row36" class="row filled" ><input type="checkbox" id="checkbox720" name="checkbox720" onclick="handleBox(720)"></input>
+				</div><div id="row36" class="row" ><input type="checkbox" id="checkbox720" name="checkbox720" onclick="handleBox(720)"></input>
 				<input type="checkbox" id="checkbox721" name="checkbox721" onclick="handleBox(721)"></input>
 				<input type="checkbox" id="checkbox722" name="checkbox722" onclick="handleBox(722)"></input>
 				<input type="checkbox" id="checkbox723" name="checkbox723" onclick="handleBox(723)"></input>
@@ -797,7 +821,7 @@
 				<input type="checkbox" id="checkbox737" name="checkbox737" onclick="handleBox(737)"></input>
 				<input type="checkbox" id="checkbox738" name="checkbox738" onclick="handleBox(738)"></input>
 				<input type="checkbox" id="checkbox739" name="checkbox739" onclick="handleBox(739)"></input>
-				</div><div id="row37" class="row filled" ><input type="checkbox" id="checkbox740" name="checkbox740" onclick="handleBox(740)"></input>
+				</div><div id="row37" class="row" ><input type="checkbox" id="checkbox740" name="checkbox740" onclick="handleBox(740)"></input>
 				<input type="checkbox" id="checkbox741" name="checkbox741" onclick="handleBox(741)"></input>
 				<input type="checkbox" id="checkbox742" name="checkbox742" onclick="handleBox(742)"></input>
 				<input type="checkbox" id="checkbox743" name="checkbox743" onclick="handleBox(743)"></input>
@@ -817,7 +841,7 @@
 				<input type="checkbox" id="checkbox757" name="checkbox757" onclick="handleBox(757)"></input>
 				<input type="checkbox" id="checkbox758" name="checkbox758" onclick="handleBox(758)"></input>
 				<input type="checkbox" id="checkbox759" name="checkbox759" onclick="handleBox(759)"></input>
-				</div><div id="row38" class="row filled" ><input type="checkbox" id="checkbox760" name="checkbox760" onclick="handleBox(760)"></input>
+				</div><div id="row38" class="row" ><input type="checkbox" id="checkbox760" name="checkbox760" onclick="handleBox(760)"></input>
 				<input type="checkbox" id="checkbox761" name="checkbox761" onclick="handleBox(761)"></input>
 				<input type="checkbox" id="checkbox762" name="checkbox762" onclick="handleBox(762)"></input>
 				<input type="checkbox" id="checkbox763" name="checkbox763" onclick="handleBox(763)"></input>
@@ -837,7 +861,7 @@
 				<input type="checkbox" id="checkbox777" name="checkbox777" onclick="handleBox(777)"></input>
 				<input type="checkbox" id="checkbox778" name="checkbox778" onclick="handleBox(778)"></input>
 				<input type="checkbox" id="checkbox779" name="checkbox779" onclick="handleBox(779)"></input>
-				</div><div id="row39" class="row filled" ><input type="checkbox" id="checkbox780" name="checkbox780" onclick="handleBox(780)"></input>
+				</div><div id="row39" class="row" ><input type="checkbox" id="checkbox780" name="checkbox780" onclick="handleBox(780)"></input>
 				<input type="checkbox" id="checkbox781" name="checkbox781" onclick="handleBox(781)"></input>
 				<input type="checkbox" id="checkbox782" name="checkbox782" onclick="handleBox(782)"></input>
 				<input type="checkbox" id="checkbox783" name="checkbox783" onclick="handleBox(783)"></input>
@@ -857,7 +881,7 @@
 				<input type="checkbox" id="checkbox797" name="checkbox797" onclick="handleBox(797)"></input>
 				<input type="checkbox" id="checkbox798" name="checkbox798" onclick="handleBox(798)"></input>
 				<input type="checkbox" id="checkbox799" name="checkbox799" onclick="handleBox(799)"></input>
-				</div><div id="row40" class="row filled" ><input type="checkbox" id="checkbox800" name="checkbox800" onclick="handleBox(800)"></input>
+				</div><div id="row40" class="row" ><input type="checkbox" id="checkbox800" name="checkbox800" onclick="handleBox(800)"></input>
 				<input type="checkbox" id="checkbox801" name="checkbox801" onclick="handleBox(801)"></input>
 				<input type="checkbox" id="checkbox802" name="checkbox802" onclick="handleBox(802)"></input>
 				<input type="checkbox" id="checkbox803" name="checkbox803" onclick="handleBox(803)"></input>
@@ -877,7 +901,7 @@
 				<input type="checkbox" id="checkbox817" name="checkbox817" onclick="handleBox(817)"></input>
 				<input type="checkbox" id="checkbox818" name="checkbox818" onclick="handleBox(818)"></input>
 				<input type="checkbox" id="checkbox819" name="checkbox819" onclick="handleBox(819)"></input>
-				</div><div id="row41" class="row filled" ><input type="checkbox" id="checkbox820" name="checkbox820" onclick="handleBox(820)"></input>
+				</div><div id="row41" class="row" ><input type="checkbox" id="checkbox820" name="checkbox820" onclick="handleBox(820)"></input>
 				<input type="checkbox" id="checkbox821" name="checkbox821" onclick="handleBox(821)"></input>
 				<input type="checkbox" id="checkbox822" name="checkbox822" onclick="handleBox(822)"></input>
 				<input type="checkbox" id="checkbox823" name="checkbox823" onclick="handleBox(823)"></input>
@@ -897,7 +921,7 @@
 				<input type="checkbox" id="checkbox837" name="checkbox837" onclick="handleBox(837)"></input>
 				<input type="checkbox" id="checkbox838" name="checkbox838" onclick="handleBox(838)"></input>
 				<input type="checkbox" id="checkbox839" name="checkbox839" onclick="handleBox(839)"></input>
-				</div><div id="row42" class="row filled" ><input type="checkbox" id="checkbox840" name="checkbox840" onclick="handleBox(840)"></input>
+				</div><div id="row42" class="row" ><input type="checkbox" id="checkbox840" name="checkbox840" onclick="handleBox(840)"></input>
 				<input type="checkbox" id="checkbox841" name="checkbox841" onclick="handleBox(841)"></input>
 				<input type="checkbox" id="checkbox842" name="checkbox842" onclick="handleBox(842)"></input>
 				<input type="checkbox" id="checkbox843" name="checkbox843" onclick="handleBox(843)"></input>
@@ -917,7 +941,7 @@
 				<input type="checkbox" id="checkbox857" name="checkbox857" onclick="handleBox(857)"></input>
 				<input type="checkbox" id="checkbox858" name="checkbox858" onclick="handleBox(858)"></input>
 				<input type="checkbox" id="checkbox859" name="checkbox859" onclick="handleBox(859)"></input>
-				</div><div id="row43" class="row filled" ><input type="checkbox" id="checkbox860" name="checkbox860" onclick="handleBox(860)"></input>
+				</div><div id="row43" class="row" ><input type="checkbox" id="checkbox860" name="checkbox860" onclick="handleBox(860)"></input>
 				<input type="checkbox" id="checkbox861" name="checkbox861" onclick="handleBox(861)"></input>
 				<input type="checkbox" id="checkbox862" name="checkbox862" onclick="handleBox(862)"></input>
 				<input type="checkbox" id="checkbox863" name="checkbox863" onclick="handleBox(863)"></input>
@@ -937,7 +961,7 @@
 				<input type="checkbox" id="checkbox877" name="checkbox877" onclick="handleBox(877)"></input>
 				<input type="checkbox" id="checkbox878" name="checkbox878" onclick="handleBox(878)"></input>
 				<input type="checkbox" id="checkbox879" name="checkbox879" onclick="handleBox(879)"></input>
-				</div><div id="row44" class="row filled" ><input type="checkbox" id="checkbox880" name="checkbox880" onclick="handleBox(880)"></input>
+				</div><div id="row44" class="row" ><input type="checkbox" id="checkbox880" name="checkbox880" onclick="handleBox(880)"></input>
 				<input type="checkbox" id="checkbox881" name="checkbox881" onclick="handleBox(881)"></input>
 				<input type="checkbox" id="checkbox882" name="checkbox882" onclick="handleBox(882)"></input>
 				<input type="checkbox" id="checkbox883" name="checkbox883" onclick="handleBox(883)"></input>
@@ -957,7 +981,7 @@
 				<input type="checkbox" id="checkbox897" name="checkbox897" onclick="handleBox(897)"></input>
 				<input type="checkbox" id="checkbox898" name="checkbox898" onclick="handleBox(898)"></input>
 				<input type="checkbox" id="checkbox899" name="checkbox899" onclick="handleBox(899)"></input>
-				</div><div id="row45" class="row filled" ><input type="checkbox" id="checkbox900" name="checkbox900" onclick="handleBox(900)"></input>
+				</div><div id="row45" class="row" ><input type="checkbox" id="checkbox900" name="checkbox900" onclick="handleBox(900)"></input>
 				<input type="checkbox" id="checkbox901" name="checkbox901" onclick="handleBox(901)"></input>
 				<input type="checkbox" id="checkbox902" name="checkbox902" onclick="handleBox(902)"></input>
 				<input type="checkbox" id="checkbox903" name="checkbox903" onclick="handleBox(903)"></input>
@@ -977,7 +1001,7 @@
 				<input type="checkbox" id="checkbox917" name="checkbox917" onclick="handleBox(917)"></input>
 				<input type="checkbox" id="checkbox918" name="checkbox918" onclick="handleBox(918)"></input>
 				<input type="checkbox" id="checkbox919" name="checkbox919" onclick="handleBox(919)"></input>
-				</div><div id="row46" class="row filled" ><input type="checkbox" id="checkbox920" name="checkbox920" onclick="handleBox(920)"></input>
+				</div><div id="row46" class="row" ><input type="checkbox" id="checkbox920" name="checkbox920" onclick="handleBox(920)"></input>
 				<input type="checkbox" id="checkbox921" name="checkbox921" onclick="handleBox(921)"></input>
 				<input type="checkbox" id="checkbox922" name="checkbox922" onclick="handleBox(922)"></input>
 				<input type="checkbox" id="checkbox923" name="checkbox923" onclick="handleBox(923)"></input>
@@ -997,7 +1021,7 @@
 				<input type="checkbox" id="checkbox937" name="checkbox937" onclick="handleBox(937)"></input>
 				<input type="checkbox" id="checkbox938" name="checkbox938" onclick="handleBox(938)"></input>
 				<input type="checkbox" id="checkbox939" name="checkbox939" onclick="handleBox(939)"></input>
-				</div><div id="row47" class="row filled" ><input type="checkbox" id="checkbox940" name="checkbox940" onclick="handleBox(940)"></input>
+				</div><div id="row47" class="row" ><input type="checkbox" id="checkbox940" name="checkbox940" onclick="handleBox(940)"></input>
 				<input type="checkbox" id="checkbox941" name="checkbox941" onclick="handleBox(941)"></input>
 				<input type="checkbox" id="checkbox942" name="checkbox942" onclick="handleBox(942)"></input>
 				<input type="checkbox" id="checkbox943" name="checkbox943" onclick="handleBox(943)"></input>
@@ -1017,7 +1041,7 @@
 				<input type="checkbox" id="checkbox957" name="checkbox957" onclick="handleBox(957)"></input>
 				<input type="checkbox" id="checkbox958" name="checkbox958" onclick="handleBox(958)"></input>
 				<input type="checkbox" id="checkbox959" name="checkbox959" onclick="handleBox(959)"></input>
-				</div><div id="row48" class="row filled" ><input type="checkbox" id="checkbox960" name="checkbox960" onclick="handleBox(960)"></input>
+				</div><div id="row48" class="row" ><input type="checkbox" id="checkbox960" name="checkbox960" onclick="handleBox(960)"></input>
 				<input type="checkbox" id="checkbox961" name="checkbox961" onclick="handleBox(961)"></input>
 				<input type="checkbox" id="checkbox962" name="checkbox962" onclick="handleBox(962)"></input>
 				<input type="checkbox" id="checkbox963" name="checkbox963" onclick="handleBox(963)"></input>
@@ -1037,7 +1061,7 @@
 				<input type="checkbox" id="checkbox977" name="checkbox977" onclick="handleBox(977)"></input>
 				<input type="checkbox" id="checkbox978" name="checkbox978" onclick="handleBox(978)"></input>
 				<input type="checkbox" id="checkbox979" name="checkbox979" onclick="handleBox(979)"></input>
-				</div><div id="row49" class="row filled" ><input type="checkbox" id="checkbox980" name="checkbox980" onclick="handleBox(980)"></input>
+				</div><div id="row49" class="row" ><input type="checkbox" id="checkbox980" name="checkbox980" onclick="handleBox(980)"></input>
 				<input type="checkbox" id="checkbox981" name="checkbox981" onclick="handleBox(981)"></input>
 				<input type="checkbox" id="checkbox982" name="checkbox982" onclick="handleBox(982)"></input>
 				<input type="checkbox" id="checkbox983" name="checkbox983" onclick="handleBox(983)"></input>
@@ -1057,7 +1081,7 @@
 				<input type="checkbox" id="checkbox997" name="checkbox997" onclick="handleBox(997)"></input>
 				<input type="checkbox" id="checkbox998" name="checkbox998" onclick="handleBox(998)"></input>
 				<input type="checkbox" id="checkbox999" name="checkbox999" onclick="handleBox(999)"></input>
-				</div><div id="row50" class="row filled" ><input type="checkbox" id="checkbox1000" name="checkbox1000" onclick="handleBox(1000)"></input>
+				</div><div id="row50" class="row" ><input type="checkbox" id="checkbox1000" name="checkbox1000" onclick="handleBox(1000)"></input>
 				<input type="checkbox" id="checkbox1001" name="checkbox1001" onclick="handleBox(1001)"></input>
 				<input type="checkbox" id="checkbox1002" name="checkbox1002" onclick="handleBox(1002)"></input>
 				<input type="checkbox" id="checkbox1003" name="checkbox1003" onclick="handleBox(1003)"></input>
@@ -1077,7 +1101,7 @@
 				<input type="checkbox" id="checkbox1017" name="checkbox1017" onclick="handleBox(1017)"></input>
 				<input type="checkbox" id="checkbox1018" name="checkbox1018" onclick="handleBox(1018)"></input>
 				<input type="checkbox" id="checkbox1019" name="checkbox1019" onclick="handleBox(1019)"></input>
-				</div><div id="row51" class="row filled" ><input type="checkbox" id="checkbox1020" name="checkbox1020" onclick="handleBox(1020)"></input>
+				</div><div id="row51" class="row" ><input type="checkbox" id="checkbox1020" name="checkbox1020" onclick="handleBox(1020)"></input>
 				<input type="checkbox" id="checkbox1021" name="checkbox1021" onclick="handleBox(1021)"></input>
 				<input type="checkbox" id="checkbox1022" name="checkbox1022" onclick="handleBox(1022)"></input>
 				<input type="checkbox" id="checkbox1023" name="checkbox1023" onclick="handleBox(1023)"></input>
@@ -1097,7 +1121,7 @@
 				<input type="checkbox" id="checkbox1037" name="checkbox1037" onclick="handleBox(1037)"></input>
 				<input type="checkbox" id="checkbox1038" name="checkbox1038" onclick="handleBox(1038)"></input>
 				<input type="checkbox" id="checkbox1039" name="checkbox1039" onclick="handleBox(1039)"></input>
-				</div><div id="row52" class="row filled" ><input type="checkbox" id="checkbox1040" name="checkbox1040" onclick="handleBox(1040)"></input>
+				</div><div id="row52" class="row" ><input type="checkbox" id="checkbox1040" name="checkbox1040" onclick="handleBox(1040)"></input>
 				<input type="checkbox" id="checkbox1041" name="checkbox1041" onclick="handleBox(1041)"></input>
 				<input type="checkbox" id="checkbox1042" name="checkbox1042" onclick="handleBox(1042)"></input>
 				<input type="checkbox" id="checkbox1043" name="checkbox1043" onclick="handleBox(1043)"></input>
@@ -1117,7 +1141,7 @@
 				<input type="checkbox" id="checkbox1057" name="checkbox1057" onclick="handleBox(1057)"></input>
 				<input type="checkbox" id="checkbox1058" name="checkbox1058" onclick="handleBox(1058)"></input>
 				<input type="checkbox" id="checkbox1059" name="checkbox1059" onclick="handleBox(1059)"></input>
-				</div><div id="row53" class="row filled" ><input type="checkbox" id="checkbox1060" name="checkbox1060" onclick="handleBox(1060)"></input>
+				</div><div id="row53" class="row" ><input type="checkbox" id="checkbox1060" name="checkbox1060" onclick="handleBox(1060)"></input>
 				<input type="checkbox" id="checkbox1061" name="checkbox1061" onclick="handleBox(1061)"></input>
 				<input type="checkbox" id="checkbox1062" name="checkbox1062" onclick="handleBox(1062)"></input>
 				<input type="checkbox" id="checkbox1063" name="checkbox1063" onclick="handleBox(1063)"></input>
@@ -1137,7 +1161,7 @@
 				<input type="checkbox" id="checkbox1077" name="checkbox1077" onclick="handleBox(1077)"></input>
 				<input type="checkbox" id="checkbox1078" name="checkbox1078" onclick="handleBox(1078)"></input>
 				<input type="checkbox" id="checkbox1079" name="checkbox1079" onclick="handleBox(1079)"></input>
-				</div><div id="row54" class="row filled" ><input type="checkbox" id="checkbox1080" name="checkbox1080" onclick="handleBox(1080)"></input>
+				</div><div id="row54" class="row" ><input type="checkbox" id="checkbox1080" name="checkbox1080" onclick="handleBox(1080)"></input>
 				<input type="checkbox" id="checkbox1081" name="checkbox1081" onclick="handleBox(1081)"></input>
 				<input type="checkbox" id="checkbox1082" name="checkbox1082" onclick="handleBox(1082)"></input>
 				<input type="checkbox" id="checkbox1083" name="checkbox1083" onclick="handleBox(1083)"></input>
@@ -1157,7 +1181,7 @@
 				<input type="checkbox" id="checkbox1097" name="checkbox1097" onclick="handleBox(1097)"></input>
 				<input type="checkbox" id="checkbox1098" name="checkbox1098" onclick="handleBox(1098)"></input>
 				<input type="checkbox" id="checkbox1099" name="checkbox1099" onclick="handleBox(1099)"></input>
-				</div><div id="row55" class="row filled" ><input type="checkbox" id="checkbox1100" name="checkbox1100" onclick="handleBox(1100)"></input>
+				</div><div id="row55" class="row" ><input type="checkbox" id="checkbox1100" name="checkbox1100" onclick="handleBox(1100)"></input>
 				<input type="checkbox" id="checkbox1101" name="checkbox1101" onclick="handleBox(1101)"></input>
 				<input type="checkbox" id="checkbox1102" name="checkbox1102" onclick="handleBox(1102)"></input>
 				<input type="checkbox" id="checkbox1103" name="checkbox1103" onclick="handleBox(1103)"></input>
@@ -1177,7 +1201,7 @@
 				<input type="checkbox" id="checkbox1117" name="checkbox1117" onclick="handleBox(1117)"></input>
 				<input type="checkbox" id="checkbox1118" name="checkbox1118" onclick="handleBox(1118)"></input>
 				<input type="checkbox" id="checkbox1119" name="checkbox1119" onclick="handleBox(1119)"></input>
-				</div><div id="row56" class="row filled" ><input type="checkbox" id="checkbox1120" name="checkbox1120" onclick="handleBox(1120)"></input>
+				</div><div id="row56" class="row" ><input type="checkbox" id="checkbox1120" name="checkbox1120" onclick="handleBox(1120)"></input>
 				<input type="checkbox" id="checkbox1121" name="checkbox1121" onclick="handleBox(1121)"></input>
 				<input type="checkbox" id="checkbox1122" name="checkbox1122" onclick="handleBox(1122)"></input>
 				<input type="checkbox" id="checkbox1123" name="checkbox1123" onclick="handleBox(1123)"></input>
@@ -1197,7 +1221,7 @@
 				<input type="checkbox" id="checkbox1137" name="checkbox1137" onclick="handleBox(1137)"></input>
 				<input type="checkbox" id="checkbox1138" name="checkbox1138" onclick="handleBox(1138)"></input>
 				<input type="checkbox" id="checkbox1139" name="checkbox1139" onclick="handleBox(1139)"></input>
-				</div><div id="row57" class="row filled" ><input type="checkbox" id="checkbox1140" name="checkbox1140" onclick="handleBox(1140)"></input>
+				</div><div id="row57" class="row" ><input type="checkbox" id="checkbox1140" name="checkbox1140" onclick="handleBox(1140)"></input>
 				<input type="checkbox" id="checkbox1141" name="checkbox1141" onclick="handleBox(1141)"></input>
 				<input type="checkbox" id="checkbox1142" name="checkbox1142" onclick="handleBox(1142)"></input>
 				<input type="checkbox" id="checkbox1143" name="checkbox1143" onclick="handleBox(1143)"></input>
@@ -1217,7 +1241,7 @@
 				<input type="checkbox" id="checkbox1157" name="checkbox1157" onclick="handleBox(1157)"></input>
 				<input type="checkbox" id="checkbox1158" name="checkbox1158" onclick="handleBox(1158)"></input>
 				<input type="checkbox" id="checkbox1159" name="checkbox1159" onclick="handleBox(1159)"></input>
-				</div><div id="row58" class="row filled" ><input type="checkbox" id="checkbox1160" name="checkbox1160" onclick="handleBox(1160)"></input>
+				</div><div id="row58" class="row" ><input type="checkbox" id="checkbox1160" name="checkbox1160" onclick="handleBox(1160)"></input>
 				<input type="checkbox" id="checkbox1161" name="checkbox1161" onclick="handleBox(1161)"></input>
 				<input type="checkbox" id="checkbox1162" name="checkbox1162" onclick="handleBox(1162)"></input>
 				<input type="checkbox" id="checkbox1163" name="checkbox1163" onclick="handleBox(1163)"></input>
@@ -1237,7 +1261,7 @@
 				<input type="checkbox" id="checkbox1177" name="checkbox1177" onclick="handleBox(1177)"></input>
 				<input type="checkbox" id="checkbox1178" name="checkbox1178" onclick="handleBox(1178)"></input>
 				<input type="checkbox" id="checkbox1179" name="checkbox1179" onclick="handleBox(1179)"></input>
-				</div><div id="row59" class="row filled" ><input type="checkbox" id="checkbox1180" name="checkbox1180" onclick="handleBox(1180)"></input>
+				</div><div id="row59" class="row" ><input type="checkbox" id="checkbox1180" name="checkbox1180" onclick="handleBox(1180)"></input>
 				<input type="checkbox" id="checkbox1181" name="checkbox1181" onclick="handleBox(1181)"></input>
 				<input type="checkbox" id="checkbox1182" name="checkbox1182" onclick="handleBox(1182)"></input>
 				<input type="checkbox" id="checkbox1183" name="checkbox1183" onclick="handleBox(1183)"></input>
@@ -1257,7 +1281,7 @@
 				<input type="checkbox" id="checkbox1197" name="checkbox1197" onclick="handleBox(1197)"></input>
 				<input type="checkbox" id="checkbox1198" name="checkbox1198" onclick="handleBox(1198)"></input>
 				<input type="checkbox" id="checkbox1199" name="checkbox1199" onclick="handleBox(1199)"></input>
-				</div><div id="row60" class="row filled" ><input type="checkbox" id="checkbox1200" name="checkbox1200" onclick="handleBox(1200)"></input>
+				</div><div id="row60" class="row" ><input type="checkbox" id="checkbox1200" name="checkbox1200" onclick="handleBox(1200)"></input>
 				<input type="checkbox" id="checkbox1201" name="checkbox1201" onclick="handleBox(1201)"></input>
 				<input type="checkbox" id="checkbox1202" name="checkbox1202" onclick="handleBox(1202)"></input>
 				<input type="checkbox" id="checkbox1203" name="checkbox1203" onclick="handleBox(1203)"></input>
@@ -1277,7 +1301,7 @@
 				<input type="checkbox" id="checkbox1217" name="checkbox1217" onclick="handleBox(1217)"></input>
 				<input type="checkbox" id="checkbox1218" name="checkbox1218" onclick="handleBox(1218)"></input>
 				<input type="checkbox" id="checkbox1219" name="checkbox1219" onclick="handleBox(1219)"></input>
-				</div><div id="row61" class="row filled" ><input type="checkbox" id="checkbox1220" name="checkbox1220" onclick="handleBox(1220)"></input>
+				</div><div id="row61" class="row" ><input type="checkbox" id="checkbox1220" name="checkbox1220" onclick="handleBox(1220)"></input>
 				<input type="checkbox" id="checkbox1221" name="checkbox1221" onclick="handleBox(1221)"></input>
 				<input type="checkbox" id="checkbox1222" name="checkbox1222" onclick="handleBox(1222)"></input>
 				<input type="checkbox" id="checkbox1223" name="checkbox1223" onclick="handleBox(1223)"></input>
@@ -1297,7 +1321,7 @@
 				<input type="checkbox" id="checkbox1237" name="checkbox1237" onclick="handleBox(1237)"></input>
 				<input type="checkbox" id="checkbox1238" name="checkbox1238" onclick="handleBox(1238)"></input>
 				<input type="checkbox" id="checkbox1239" name="checkbox1239" onclick="handleBox(1239)"></input>
-				</div><div id="row62" class="row filled" ><input type="checkbox" id="checkbox1240" name="checkbox1240" onclick="handleBox(1240)"></input>
+				</div><div id="row62" class="row" ><input type="checkbox" id="checkbox1240" name="checkbox1240" onclick="handleBox(1240)"></input>
 				<input type="checkbox" id="checkbox1241" name="checkbox1241" onclick="handleBox(1241)"></input>
 				<input type="checkbox" id="checkbox1242" name="checkbox1242" onclick="handleBox(1242)"></input>
 				<input type="checkbox" id="checkbox1243" name="checkbox1243" onclick="handleBox(1243)"></input>
@@ -1317,7 +1341,7 @@
 				<input type="checkbox" id="checkbox1257" name="checkbox1257" onclick="handleBox(1257)"></input>
 				<input type="checkbox" id="checkbox1258" name="checkbox1258" onclick="handleBox(1258)"></input>
 				<input type="checkbox" id="checkbox1259" name="checkbox1259" onclick="handleBox(1259)"></input>
-				</div><div id="row63" class="row filled" ><input type="checkbox" id="checkbox1260" name="checkbox1260" onclick="handleBox(1260)"></input>
+				</div><div id="row63" class="row" ><input type="checkbox" id="checkbox1260" name="checkbox1260" onclick="handleBox(1260)"></input>
 				<input type="checkbox" id="checkbox1261" name="checkbox1261" onclick="handleBox(1261)"></input>
 				<input type="checkbox" id="checkbox1262" name="checkbox1262" onclick="handleBox(1262)"></input>
 				<input type="checkbox" id="checkbox1263" name="checkbox1263" onclick="handleBox(1263)"></input>
@@ -1337,7 +1361,7 @@
 				<input type="checkbox" id="checkbox1277" name="checkbox1277" onclick="handleBox(1277)"></input>
 				<input type="checkbox" id="checkbox1278" name="checkbox1278" onclick="handleBox(1278)"></input>
 				<input type="checkbox" id="checkbox1279" name="checkbox1279" onclick="handleBox(1279)"></input>
-				</div><div id="row64" class="row filled" ><input type="checkbox" id="checkbox1280" name="checkbox1280" onclick="handleBox(1280)"></input>
+				</div><div id="row64" class="row" ><input type="checkbox" id="checkbox1280" name="checkbox1280" onclick="handleBox(1280)"></input>
 				<input type="checkbox" id="checkbox1281" name="checkbox1281" onclick="handleBox(1281)"></input>
 				<input type="checkbox" id="checkbox1282" name="checkbox1282" onclick="handleBox(1282)"></input>
 				<input type="checkbox" id="checkbox1283" name="checkbox1283" onclick="handleBox(1283)"></input>
@@ -1357,7 +1381,7 @@
 				<input type="checkbox" id="checkbox1297" name="checkbox1297" onclick="handleBox(1297)"></input>
 				<input type="checkbox" id="checkbox1298" name="checkbox1298" onclick="handleBox(1298)"></input>
 				<input type="checkbox" id="checkbox1299" name="checkbox1299" onclick="handleBox(1299)"></input>
-				</div><div id="row65" class="row filled" ><input type="checkbox" id="checkbox1300" name="checkbox1300" onclick="handleBox(1300)"></input>
+				</div><div id="row65" class="row" ><input type="checkbox" id="checkbox1300" name="checkbox1300" onclick="handleBox(1300)"></input>
 				<input type="checkbox" id="checkbox1301" name="checkbox1301" onclick="handleBox(1301)"></input>
 				<input type="checkbox" id="checkbox1302" name="checkbox1302" onclick="handleBox(1302)"></input>
 				<input type="checkbox" id="checkbox1303" name="checkbox1303" onclick="handleBox(1303)"></input>
@@ -1377,7 +1401,7 @@
 				<input type="checkbox" id="checkbox1317" name="checkbox1317" onclick="handleBox(1317)"></input>
 				<input type="checkbox" id="checkbox1318" name="checkbox1318" onclick="handleBox(1318)"></input>
 				<input type="checkbox" id="checkbox1319" name="checkbox1319" onclick="handleBox(1319)"></input>
-				</div><div id="row66" class="row filled" ><input type="checkbox" id="checkbox1320" name="checkbox1320" onclick="handleBox(1320)"></input>
+				</div><div id="row66" class="row" ><input type="checkbox" id="checkbox1320" name="checkbox1320" onclick="handleBox(1320)"></input>
 				<input type="checkbox" id="checkbox1321" name="checkbox1321" onclick="handleBox(1321)"></input>
 				<input type="checkbox" id="checkbox1322" name="checkbox1322" onclick="handleBox(1322)"></input>
 				<input type="checkbox" id="checkbox1323" name="checkbox1323" onclick="handleBox(1323)"></input>
@@ -1397,7 +1421,7 @@
 				<input type="checkbox" id="checkbox1337" name="checkbox1337" onclick="handleBox(1337)"></input>
 				<input type="checkbox" id="checkbox1338" name="checkbox1338" onclick="handleBox(1338)"></input>
 				<input type="checkbox" id="checkbox1339" name="checkbox1339" onclick="handleBox(1339)"></input>
-				</div><div id="row67" class="row filled" ><input type="checkbox" id="checkbox1340" name="checkbox1340" onclick="handleBox(1340)"></input>
+				</div><div id="row67" class="row" ><input type="checkbox" id="checkbox1340" name="checkbox1340" onclick="handleBox(1340)"></input>
 				<input type="checkbox" id="checkbox1341" name="checkbox1341" onclick="handleBox(1341)"></input>
 				<input type="checkbox" id="checkbox1342" name="checkbox1342" onclick="handleBox(1342)"></input>
 				<input type="checkbox" id="checkbox1343" name="checkbox1343" onclick="handleBox(1343)"></input>
@@ -1417,7 +1441,7 @@
 				<input type="checkbox" id="checkbox1357" name="checkbox1357" onclick="handleBox(1357)"></input>
 				<input type="checkbox" id="checkbox1358" name="checkbox1358" onclick="handleBox(1358)"></input>
 				<input type="checkbox" id="checkbox1359" name="checkbox1359" onclick="handleBox(1359)"></input>
-				</div><div id="row68" class="row filled" ><input type="checkbox" id="checkbox1360" name="checkbox1360" onclick="handleBox(1360)"></input>
+				</div><div id="row68" class="row" ><input type="checkbox" id="checkbox1360" name="checkbox1360" onclick="handleBox(1360)"></input>
 				<input type="checkbox" id="checkbox1361" name="checkbox1361" onclick="handleBox(1361)"></input>
 				<input type="checkbox" id="checkbox1362" name="checkbox1362" onclick="handleBox(1362)"></input>
 				<input type="checkbox" id="checkbox1363" name="checkbox1363" onclick="handleBox(1363)"></input>
@@ -1437,7 +1461,7 @@
 				<input type="checkbox" id="checkbox1377" name="checkbox1377" onclick="handleBox(1377)"></input>
 				<input type="checkbox" id="checkbox1378" name="checkbox1378" onclick="handleBox(1378)"></input>
 				<input type="checkbox" id="checkbox1379" name="checkbox1379" onclick="handleBox(1379)"></input>
-				</div><div id="row69" class="row filled" ><input type="checkbox" id="checkbox1380" name="checkbox1380" onclick="handleBox(1380)"></input>
+				</div><div id="row69" class="row" ><input type="checkbox" id="checkbox1380" name="checkbox1380" onclick="handleBox(1380)"></input>
 				<input type="checkbox" id="checkbox1381" name="checkbox1381" onclick="handleBox(1381)"></input>
 				<input type="checkbox" id="checkbox1382" name="checkbox1382" onclick="handleBox(1382)"></input>
 				<input type="checkbox" id="checkbox1383" name="checkbox1383" onclick="handleBox(1383)"></input>
@@ -1457,7 +1481,7 @@
 				<input type="checkbox" id="checkbox1397" name="checkbox1397" onclick="handleBox(1397)"></input>
 				<input type="checkbox" id="checkbox1398" name="checkbox1398" onclick="handleBox(1398)"></input>
 				<input type="checkbox" id="checkbox1399" name="checkbox1399" onclick="handleBox(1399)"></input>
-				</div><div id="row70" class="row filled" ><input type="checkbox" id="checkbox1400" name="checkbox1400" onclick="handleBox(1400)"></input>
+				</div><div id="row70" class="row" ><input type="checkbox" id="checkbox1400" name="checkbox1400" onclick="handleBox(1400)"></input>
 				<input type="checkbox" id="checkbox1401" name="checkbox1401" onclick="handleBox(1401)"></input>
 				<input type="checkbox" id="checkbox1402" name="checkbox1402" onclick="handleBox(1402)"></input>
 				<input type="checkbox" id="checkbox1403" name="checkbox1403" onclick="handleBox(1403)"></input>
@@ -1477,7 +1501,7 @@
 				<input type="checkbox" id="checkbox1417" name="checkbox1417" onclick="handleBox(1417)"></input>
 				<input type="checkbox" id="checkbox1418" name="checkbox1418" onclick="handleBox(1418)"></input>
 				<input type="checkbox" id="checkbox1419" name="checkbox1419" onclick="handleBox(1419)"></input>
-				</div><div id="row71" class="row filled" ><input type="checkbox" id="checkbox1420" name="checkbox1420" onclick="handleBox(1420)"></input>
+				</div><div id="row71" class="row" ><input type="checkbox" id="checkbox1420" name="checkbox1420" onclick="handleBox(1420)"></input>
 				<input type="checkbox" id="checkbox1421" name="checkbox1421" onclick="handleBox(1421)"></input>
 				<input type="checkbox" id="checkbox1422" name="checkbox1422" onclick="handleBox(1422)"></input>
 				<input type="checkbox" id="checkbox1423" name="checkbox1423" onclick="handleBox(1423)"></input>
@@ -1497,7 +1521,7 @@
 				<input type="checkbox" id="checkbox1437" name="checkbox1437" onclick="handleBox(1437)"></input>
 				<input type="checkbox" id="checkbox1438" name="checkbox1438" onclick="handleBox(1438)"></input>
 				<input type="checkbox" id="checkbox1439" name="checkbox1439" onclick="handleBox(1439)"></input>
-				</div><div id="row72" class="row filled" ><input type="checkbox" id="checkbox1440" name="checkbox1440" onclick="handleBox(1440)"></input>
+				</div><div id="row72" class="row" ><input type="checkbox" id="checkbox1440" name="checkbox1440" onclick="handleBox(1440)"></input>
 				<input type="checkbox" id="checkbox1441" name="checkbox1441" onclick="handleBox(1441)"></input>
 				<input type="checkbox" id="checkbox1442" name="checkbox1442" onclick="handleBox(1442)"></input>
 				<input type="checkbox" id="checkbox1443" name="checkbox1443" onclick="handleBox(1443)"></input>
@@ -1517,7 +1541,7 @@
 				<input type="checkbox" id="checkbox1457" name="checkbox1457" onclick="handleBox(1457)"></input>
 				<input type="checkbox" id="checkbox1458" name="checkbox1458" onclick="handleBox(1458)"></input>
 				<input type="checkbox" id="checkbox1459" name="checkbox1459" onclick="handleBox(1459)"></input>
-				</div><div id="row73" class="row filled" ><input type="checkbox" id="checkbox1460" name="checkbox1460" onclick="handleBox(1460)"></input>
+				</div><div id="row73" class="row" ><input type="checkbox" id="checkbox1460" name="checkbox1460" onclick="handleBox(1460)"></input>
 				<input type="checkbox" id="checkbox1461" name="checkbox1461" onclick="handleBox(1461)"></input>
 				<input type="checkbox" id="checkbox1462" name="checkbox1462" onclick="handleBox(1462)"></input>
 				<input type="checkbox" id="checkbox1463" name="checkbox1463" onclick="handleBox(1463)"></input>
@@ -1537,7 +1561,7 @@
 				<input type="checkbox" id="checkbox1477" name="checkbox1477" onclick="handleBox(1477)"></input>
 				<input type="checkbox" id="checkbox1478" name="checkbox1478" onclick="handleBox(1478)"></input>
 				<input type="checkbox" id="checkbox1479" name="checkbox1479" onclick="handleBox(1479)"></input>
-				</div><div id="row74" class="row filled" ><input type="checkbox" id="checkbox1480" name="checkbox1480" onclick="handleBox(1480)"></input>
+				</div><div id="row74" class="row" ><input type="checkbox" id="checkbox1480" name="checkbox1480" onclick="handleBox(1480)"></input>
 				<input type="checkbox" id="checkbox1481" name="checkbox1481" onclick="handleBox(1481)"></input>
 				<input type="checkbox" id="checkbox1482" name="checkbox1482" onclick="handleBox(1482)"></input>
 				<input type="checkbox" id="checkbox1483" name="checkbox1483" onclick="handleBox(1483)"></input>
@@ -1557,7 +1581,7 @@
 				<input type="checkbox" id="checkbox1497" name="checkbox1497" onclick="handleBox(1497)"></input>
 				<input type="checkbox" id="checkbox1498" name="checkbox1498" onclick="handleBox(1498)"></input>
 				<input type="checkbox" id="checkbox1499" name="checkbox1499" onclick="handleBox(1499)"></input>
-				</div><div id="row75" class="row filled" ><input type="checkbox" id="checkbox1500" name="checkbox1500" onclick="handleBox(1500)"></input>
+				</div><div id="row75" class="row" ><input type="checkbox" id="checkbox1500" name="checkbox1500" onclick="handleBox(1500)"></input>
 				<input type="checkbox" id="checkbox1501" name="checkbox1501" onclick="handleBox(1501)"></input>
 				<input type="checkbox" id="checkbox1502" name="checkbox1502" onclick="handleBox(1502)"></input>
 				<input type="checkbox" id="checkbox1503" name="checkbox1503" onclick="handleBox(1503)"></input>
@@ -1577,7 +1601,7 @@
 				<input type="checkbox" id="checkbox1517" name="checkbox1517" onclick="handleBox(1517)"></input>
 				<input type="checkbox" id="checkbox1518" name="checkbox1518" onclick="handleBox(1518)"></input>
 				<input type="checkbox" id="checkbox1519" name="checkbox1519" onclick="handleBox(1519)"></input>
-				</div><div id="row76" class="row filled" ><input type="checkbox" id="checkbox1520" name="checkbox1520" onclick="handleBox(1520)"></input>
+				</div><div id="row76" class="row" ><input type="checkbox" id="checkbox1520" name="checkbox1520" onclick="handleBox(1520)"></input>
 				<input type="checkbox" id="checkbox1521" name="checkbox1521" onclick="handleBox(1521)"></input>
 				<input type="checkbox" id="checkbox1522" name="checkbox1522" onclick="handleBox(1522)"></input>
 				<input type="checkbox" id="checkbox1523" name="checkbox1523" onclick="handleBox(1523)"></input>
@@ -1597,7 +1621,7 @@
 				<input type="checkbox" id="checkbox1537" name="checkbox1537" onclick="handleBox(1537)"></input>
 				<input type="checkbox" id="checkbox1538" name="checkbox1538" onclick="handleBox(1538)"></input>
 				<input type="checkbox" id="checkbox1539" name="checkbox1539" onclick="handleBox(1539)"></input>
-				</div><div id="row77" class="row filled" ><input type="checkbox" id="checkbox1540" name="checkbox1540" onclick="handleBox(1540)"></input>
+				</div><div id="row77" class="row" ><input type="checkbox" id="checkbox1540" name="checkbox1540" onclick="handleBox(1540)"></input>
 				<input type="checkbox" id="checkbox1541" name="checkbox1541" onclick="handleBox(1541)"></input>
 				<input type="checkbox" id="checkbox1542" name="checkbox1542" onclick="handleBox(1542)"></input>
 				<input type="checkbox" id="checkbox1543" name="checkbox1543" onclick="handleBox(1543)"></input>
@@ -1617,7 +1641,7 @@
 				<input type="checkbox" id="checkbox1557" name="checkbox1557" onclick="handleBox(1557)"></input>
 				<input type="checkbox" id="checkbox1558" name="checkbox1558" onclick="handleBox(1558)"></input>
 				<input type="checkbox" id="checkbox1559" name="checkbox1559" onclick="handleBox(1559)"></input>
-				</div><div id="row78" class="row filled" ><input type="checkbox" id="checkbox1560" name="checkbox1560" onclick="handleBox(1560)"></input>
+				</div><div id="row78" class="row" ><input type="checkbox" id="checkbox1560" name="checkbox1560" onclick="handleBox(1560)"></input>
 				<input type="checkbox" id="checkbox1561" name="checkbox1561" onclick="handleBox(1561)"></input>
 				<input type="checkbox" id="checkbox1562" name="checkbox1562" onclick="handleBox(1562)"></input>
 				<input type="checkbox" id="checkbox1563" name="checkbox1563" onclick="handleBox(1563)"></input>
@@ -1637,7 +1661,7 @@
 				<input type="checkbox" id="checkbox1577" name="checkbox1577" onclick="handleBox(1577)"></input>
 				<input type="checkbox" id="checkbox1578" name="checkbox1578" onclick="handleBox(1578)"></input>
 				<input type="checkbox" id="checkbox1579" name="checkbox1579" onclick="handleBox(1579)"></input>
-				</div><div id="row79" class="row filled" ><input type="checkbox" id="checkbox1580" name="checkbox1580" onclick="handleBox(1580)"></input>
+				</div><div id="row79" class="row" ><input type="checkbox" id="checkbox1580" name="checkbox1580" onclick="handleBox(1580)"></input>
 				<input type="checkbox" id="checkbox1581" name="checkbox1581" onclick="handleBox(1581)"></input>
 				<input type="checkbox" id="checkbox1582" name="checkbox1582" onclick="handleBox(1582)"></input>
 				<input type="checkbox" id="checkbox1583" name="checkbox1583" onclick="handleBox(1583)"></input>
@@ -1657,7 +1681,7 @@
 				<input type="checkbox" id="checkbox1597" name="checkbox1597" onclick="handleBox(1597)"></input>
 				<input type="checkbox" id="checkbox1598" name="checkbox1598" onclick="handleBox(1598)"></input>
 				<input type="checkbox" id="checkbox1599" name="checkbox1599" onclick="handleBox(1599)"></input>
-				</div><div id="row80" class="row filled" ><input type="checkbox" id="checkbox1600" name="checkbox1600" onclick="handleBox(1600)"></input>
+				</div><div id="row80" class="row" ><input type="checkbox" id="checkbox1600" name="checkbox1600" onclick="handleBox(1600)"></input>
 				<input type="checkbox" id="checkbox1601" name="checkbox1601" onclick="handleBox(1601)"></input>
 				<input type="checkbox" id="checkbox1602" name="checkbox1602" onclick="handleBox(1602)"></input>
 				<input type="checkbox" id="checkbox1603" name="checkbox1603" onclick="handleBox(1603)"></input>
@@ -1677,7 +1701,7 @@
 				<input type="checkbox" id="checkbox1617" name="checkbox1617" onclick="handleBox(1617)"></input>
 				<input type="checkbox" id="checkbox1618" name="checkbox1618" onclick="handleBox(1618)"></input>
 				<input type="checkbox" id="checkbox1619" name="checkbox1619" onclick="handleBox(1619)"></input>
-				</div><div id="row81" class="row filled" ><input type="checkbox" id="checkbox1620" name="checkbox1620" onclick="handleBox(1620)"></input>
+				</div><div id="row81" class="row" ><input type="checkbox" id="checkbox1620" name="checkbox1620" onclick="handleBox(1620)"></input>
 				<input type="checkbox" id="checkbox1621" name="checkbox1621" onclick="handleBox(1621)"></input>
 				<input type="checkbox" id="checkbox1622" name="checkbox1622" onclick="handleBox(1622)"></input>
 				<input type="checkbox" id="checkbox1623" name="checkbox1623" onclick="handleBox(1623)"></input>
@@ -1697,7 +1721,7 @@
 				<input type="checkbox" id="checkbox1637" name="checkbox1637" onclick="handleBox(1637)"></input>
 				<input type="checkbox" id="checkbox1638" name="checkbox1638" onclick="handleBox(1638)"></input>
 				<input type="checkbox" id="checkbox1639" name="checkbox1639" onclick="handleBox(1639)"></input>
-				</div><div id="row82" class="row filled" ><input type="checkbox" id="checkbox1640" name="checkbox1640" onclick="handleBox(1640)"></input>
+				</div><div id="row82" class="row" ><input type="checkbox" id="checkbox1640" name="checkbox1640" onclick="handleBox(1640)"></input>
 				<input type="checkbox" id="checkbox1641" name="checkbox1641" onclick="handleBox(1641)"></input>
 				<input type="checkbox" id="checkbox1642" name="checkbox1642" onclick="handleBox(1642)"></input>
 				<input type="checkbox" id="checkbox1643" name="checkbox1643" onclick="handleBox(1643)"></input>
@@ -1717,7 +1741,7 @@
 				<input type="checkbox" id="checkbox1657" name="checkbox1657" onclick="handleBox(1657)"></input>
 				<input type="checkbox" id="checkbox1658" name="checkbox1658" onclick="handleBox(1658)"></input>
 				<input type="checkbox" id="checkbox1659" name="checkbox1659" onclick="handleBox(1659)"></input>
-				</div><div id="row83" class="row filled" ><input type="checkbox" id="checkbox1660" name="checkbox1660" onclick="handleBox(1660)"></input>
+				</div><div id="row83" class="row" ><input type="checkbox" id="checkbox1660" name="checkbox1660" onclick="handleBox(1660)"></input>
 				<input type="checkbox" id="checkbox1661" name="checkbox1661" onclick="handleBox(1661)"></input>
 				<input type="checkbox" id="checkbox1662" name="checkbox1662" onclick="handleBox(1662)"></input>
 				<input type="checkbox" id="checkbox1663" name="checkbox1663" onclick="handleBox(1663)"></input>
@@ -1737,7 +1761,7 @@
 				<input type="checkbox" id="checkbox1677" name="checkbox1677" onclick="handleBox(1677)"></input>
 				<input type="checkbox" id="checkbox1678" name="checkbox1678" onclick="handleBox(1678)"></input>
 				<input type="checkbox" id="checkbox1679" name="checkbox1679" onclick="handleBox(1679)"></input>
-				</div><div id="row84" class="row filled" ><input type="checkbox" id="checkbox1680" name="checkbox1680" onclick="handleBox(1680)"></input>
+				</div><div id="row84" class="row" ><input type="checkbox" id="checkbox1680" name="checkbox1680" onclick="handleBox(1680)"></input>
 				<input type="checkbox" id="checkbox1681" name="checkbox1681" onclick="handleBox(1681)"></input>
 				<input type="checkbox" id="checkbox1682" name="checkbox1682" onclick="handleBox(1682)"></input>
 				<input type="checkbox" id="checkbox1683" name="checkbox1683" onclick="handleBox(1683)"></input>
@@ -1757,7 +1781,7 @@
 				<input type="checkbox" id="checkbox1697" name="checkbox1697" onclick="handleBox(1697)"></input>
 				<input type="checkbox" id="checkbox1698" name="checkbox1698" onclick="handleBox(1698)"></input>
 				<input type="checkbox" id="checkbox1699" name="checkbox1699" onclick="handleBox(1699)"></input>
-				</div><div id="row85" class="row filled" ><input type="checkbox" id="checkbox1700" name="checkbox1700" onclick="handleBox(1700)"></input>
+				</div><div id="row85" class="row" ><input type="checkbox" id="checkbox1700" name="checkbox1700" onclick="handleBox(1700)"></input>
 				<input type="checkbox" id="checkbox1701" name="checkbox1701" onclick="handleBox(1701)"></input>
 				<input type="checkbox" id="checkbox1702" name="checkbox1702" onclick="handleBox(1702)"></input>
 				<input type="checkbox" id="checkbox1703" name="checkbox1703" onclick="handleBox(1703)"></input>
@@ -1777,7 +1801,7 @@
 				<input type="checkbox" id="checkbox1717" name="checkbox1717" onclick="handleBox(1717)"></input>
 				<input type="checkbox" id="checkbox1718" name="checkbox1718" onclick="handleBox(1718)"></input>
 				<input type="checkbox" id="checkbox1719" name="checkbox1719" onclick="handleBox(1719)"></input>
-				</div><div id="row86" class="row filled" ><input type="checkbox" id="checkbox1720" name="checkbox1720" onclick="handleBox(1720)"></input>
+				</div><div id="row86" class="row" ><input type="checkbox" id="checkbox1720" name="checkbox1720" onclick="handleBox(1720)"></input>
 				<input type="checkbox" id="checkbox1721" name="checkbox1721" onclick="handleBox(1721)"></input>
 				<input type="checkbox" id="checkbox1722" name="checkbox1722" onclick="handleBox(1722)"></input>
 				<input type="checkbox" id="checkbox1723" name="checkbox1723" onclick="handleBox(1723)"></input>
@@ -1797,7 +1821,7 @@
 				<input type="checkbox" id="checkbox1737" name="checkbox1737" onclick="handleBox(1737)"></input>
 				<input type="checkbox" id="checkbox1738" name="checkbox1738" onclick="handleBox(1738)"></input>
 				<input type="checkbox" id="checkbox1739" name="checkbox1739" onclick="handleBox(1739)"></input>
-				</div><div id="row87" class="row filled" ><input type="checkbox" id="checkbox1740" name="checkbox1740" onclick="handleBox(1740)"></input>
+				</div><div id="row87" class="row" ><input type="checkbox" id="checkbox1740" name="checkbox1740" onclick="handleBox(1740)"></input>
 				<input type="checkbox" id="checkbox1741" name="checkbox1741" onclick="handleBox(1741)"></input>
 				<input type="checkbox" id="checkbox1742" name="checkbox1742" onclick="handleBox(1742)"></input>
 				<input type="checkbox" id="checkbox1743" name="checkbox1743" onclick="handleBox(1743)"></input>
@@ -1817,7 +1841,7 @@
 				<input type="checkbox" id="checkbox1757" name="checkbox1757" onclick="handleBox(1757)"></input>
 				<input type="checkbox" id="checkbox1758" name="checkbox1758" onclick="handleBox(1758)"></input>
 				<input type="checkbox" id="checkbox1759" name="checkbox1759" onclick="handleBox(1759)"></input>
-				</div><div id="row88" class="row filled" ><input type="checkbox" id="checkbox1760" name="checkbox1760" onclick="handleBox(1760)"></input>
+				</div><div id="row88" class="row" ><input type="checkbox" id="checkbox1760" name="checkbox1760" onclick="handleBox(1760)"></input>
 				<input type="checkbox" id="checkbox1761" name="checkbox1761" onclick="handleBox(1761)"></input>
 				<input type="checkbox" id="checkbox1762" name="checkbox1762" onclick="handleBox(1762)"></input>
 				<input type="checkbox" id="checkbox1763" name="checkbox1763" onclick="handleBox(1763)"></input>
@@ -1837,7 +1861,7 @@
 				<input type="checkbox" id="checkbox1777" name="checkbox1777" onclick="handleBox(1777)"></input>
 				<input type="checkbox" id="checkbox1778" name="checkbox1778" onclick="handleBox(1778)"></input>
 				<input type="checkbox" id="checkbox1779" name="checkbox1779" onclick="handleBox(1779)"></input>
-				</div><div id="row89" class="row filled" ><input type="checkbox" id="checkbox1780" name="checkbox1780" onclick="handleBox(1780)"></input>
+				</div><div id="row89" class="row" ><input type="checkbox" id="checkbox1780" name="checkbox1780" onclick="handleBox(1780)"></input>
 				<input type="checkbox" id="checkbox1781" name="checkbox1781" onclick="handleBox(1781)"></input>
 				<input type="checkbox" id="checkbox1782" name="checkbox1782" onclick="handleBox(1782)"></input>
 				<input type="checkbox" id="checkbox1783" name="checkbox1783" onclick="handleBox(1783)"></input>
@@ -1857,7 +1881,7 @@
 				<input type="checkbox" id="checkbox1797" name="checkbox1797" onclick="handleBox(1797)"></input>
 				<input type="checkbox" id="checkbox1798" name="checkbox1798" onclick="handleBox(1798)"></input>
 				<input type="checkbox" id="checkbox1799" name="checkbox1799" onclick="handleBox(1799)"></input>
-				</div><div id="row90" class="row filled" ><input type="checkbox" id="checkbox1800" name="checkbox1800" onclick="handleBox(1800)"></input>
+				</div><div id="row90" class="row" ><input type="checkbox" id="checkbox1800" name="checkbox1800" onclick="handleBox(1800)"></input>
 				<input type="checkbox" id="checkbox1801" name="checkbox1801" onclick="handleBox(1801)"></input>
 				<input type="checkbox" id="checkbox1802" name="checkbox1802" onclick="handleBox(1802)"></input>
 				<input type="checkbox" id="checkbox1803" name="checkbox1803" onclick="handleBox(1803)"></input>
@@ -1877,7 +1901,7 @@
 				<input type="checkbox" id="checkbox1817" name="checkbox1817" onclick="handleBox(1817)"></input>
 				<input type="checkbox" id="checkbox1818" name="checkbox1818" onclick="handleBox(1818)"></input>
 				<input type="checkbox" id="checkbox1819" name="checkbox1819" onclick="handleBox(1819)"></input>
-				</div><div id="row91" class="row filled" ><input type="checkbox" id="checkbox1820" name="checkbox1820" onclick="handleBox(1820)"></input>
+				</div><div id="row91" class="row" ><input type="checkbox" id="checkbox1820" name="checkbox1820" onclick="handleBox(1820)"></input>
 				<input type="checkbox" id="checkbox1821" name="checkbox1821" onclick="handleBox(1821)"></input>
 				<input type="checkbox" id="checkbox1822" name="checkbox1822" onclick="handleBox(1822)"></input>
 				<input type="checkbox" id="checkbox1823" name="checkbox1823" onclick="handleBox(1823)"></input>
@@ -1897,7 +1921,7 @@
 				<input type="checkbox" id="checkbox1837" name="checkbox1837" onclick="handleBox(1837)"></input>
 				<input type="checkbox" id="checkbox1838" name="checkbox1838" onclick="handleBox(1838)"></input>
 				<input type="checkbox" id="checkbox1839" name="checkbox1839" onclick="handleBox(1839)"></input>
-				</div><div id="row92" class="row filled" ><input type="checkbox" id="checkbox1840" name="checkbox1840" onclick="handleBox(1840)"></input>
+				</div><div id="row92" class="row" ><input type="checkbox" id="checkbox1840" name="checkbox1840" onclick="handleBox(1840)"></input>
 				<input type="checkbox" id="checkbox1841" name="checkbox1841" onclick="handleBox(1841)"></input>
 				<input type="checkbox" id="checkbox1842" name="checkbox1842" onclick="handleBox(1842)"></input>
 				<input type="checkbox" id="checkbox1843" name="checkbox1843" onclick="handleBox(1843)"></input>
@@ -1917,7 +1941,7 @@
 				<input type="checkbox" id="checkbox1857" name="checkbox1857" onclick="handleBox(1857)"></input>
 				<input type="checkbox" id="checkbox1858" name="checkbox1858" onclick="handleBox(1858)"></input>
 				<input type="checkbox" id="checkbox1859" name="checkbox1859" onclick="handleBox(1859)"></input>
-				</div><div id="row93" class="row filled" ><input type="checkbox" id="checkbox1860" name="checkbox1860" onclick="handleBox(1860)"></input>
+				</div><div id="row93" class="row" ><input type="checkbox" id="checkbox1860" name="checkbox1860" onclick="handleBox(1860)"></input>
 				<input type="checkbox" id="checkbox1861" name="checkbox1861" onclick="handleBox(1861)"></input>
 				<input type="checkbox" id="checkbox1862" name="checkbox1862" onclick="handleBox(1862)"></input>
 				<input type="checkbox" id="checkbox1863" name="checkbox1863" onclick="handleBox(1863)"></input>
@@ -1937,7 +1961,7 @@
 				<input type="checkbox" id="checkbox1877" name="checkbox1877" onclick="handleBox(1877)"></input>
 				<input type="checkbox" id="checkbox1878" name="checkbox1878" onclick="handleBox(1878)"></input>
 				<input type="checkbox" id="checkbox1879" name="checkbox1879" onclick="handleBox(1879)"></input>
-				</div><div id="row94" class="row filled" ><input type="checkbox" id="checkbox1880" name="checkbox1880" onclick="handleBox(1880)"></input>
+				</div><div id="row94" class="row" ><input type="checkbox" id="checkbox1880" name="checkbox1880" onclick="handleBox(1880)"></input>
 				<input type="checkbox" id="checkbox1881" name="checkbox1881" onclick="handleBox(1881)"></input>
 				<input type="checkbox" id="checkbox1882" name="checkbox1882" onclick="handleBox(1882)"></input>
 				<input type="checkbox" id="checkbox1883" name="checkbox1883" onclick="handleBox(1883)"></input>
@@ -1957,7 +1981,7 @@
 				<input type="checkbox" id="checkbox1897" name="checkbox1897" onclick="handleBox(1897)"></input>
 				<input type="checkbox" id="checkbox1898" name="checkbox1898" onclick="handleBox(1898)"></input>
 				<input type="checkbox" id="checkbox1899" name="checkbox1899" onclick="handleBox(1899)"></input>
-				</div><div id="row95" class="row filled" ><input type="checkbox" id="checkbox1900" name="checkbox1900" onclick="handleBox(1900)"></input>
+				</div><div id="row95" class="row" ><input type="checkbox" id="checkbox1900" name="checkbox1900" onclick="handleBox(1900)"></input>
 				<input type="checkbox" id="checkbox1901" name="checkbox1901" onclick="handleBox(1901)"></input>
 				<input type="checkbox" id="checkbox1902" name="checkbox1902" onclick="handleBox(1902)"></input>
 				<input type="checkbox" id="checkbox1903" name="checkbox1903" onclick="handleBox(1903)"></input>
@@ -1977,7 +2001,7 @@
 				<input type="checkbox" id="checkbox1917" name="checkbox1917" onclick="handleBox(1917)"></input>
 				<input type="checkbox" id="checkbox1918" name="checkbox1918" onclick="handleBox(1918)"></input>
 				<input type="checkbox" id="checkbox1919" name="checkbox1919" onclick="handleBox(1919)"></input>
-				</div><div id="row96" class="row filled" ><input type="checkbox" id="checkbox1920" name="checkbox1920" onclick="handleBox(1920)"></input>
+				</div><div id="row96" class="row" ><input type="checkbox" id="checkbox1920" name="checkbox1920" onclick="handleBox(1920)"></input>
 				<input type="checkbox" id="checkbox1921" name="checkbox1921" onclick="handleBox(1921)"></input>
 				<input type="checkbox" id="checkbox1922" name="checkbox1922" onclick="handleBox(1922)"></input>
 				<input type="checkbox" id="checkbox1923" name="checkbox1923" onclick="handleBox(1923)"></input>
@@ -1997,7 +2021,7 @@
 				<input type="checkbox" id="checkbox1937" name="checkbox1937" onclick="handleBox(1937)"></input>
 				<input type="checkbox" id="checkbox1938" name="checkbox1938" onclick="handleBox(1938)"></input>
 				<input type="checkbox" id="checkbox1939" name="checkbox1939" onclick="handleBox(1939)"></input>
-				</div><div id="row97" class="row filled" ><input type="checkbox" id="checkbox1940" name="checkbox1940" onclick="handleBox(1940)"></input>
+				</div><div id="row97" class="row" ><input type="checkbox" id="checkbox1940" name="checkbox1940" onclick="handleBox(1940)"></input>
 				<input type="checkbox" id="checkbox1941" name="checkbox1941" onclick="handleBox(1941)"></input>
 				<input type="checkbox" id="checkbox1942" name="checkbox1942" onclick="handleBox(1942)"></input>
 				<input type="checkbox" id="checkbox1943" name="checkbox1943" onclick="handleBox(1943)"></input>
@@ -2017,7 +2041,7 @@
 				<input type="checkbox" id="checkbox1957" name="checkbox1957" onclick="handleBox(1957)"></input>
 				<input type="checkbox" id="checkbox1958" name="checkbox1958" onclick="handleBox(1958)"></input>
 				<input type="checkbox" id="checkbox1959" name="checkbox1959" onclick="handleBox(1959)"></input>
-				</div><div id="row98" class="row filled" ><input type="checkbox" id="checkbox1960" name="checkbox1960" onclick="handleBox(1960)"></input>
+				</div><div id="row98" class="row" ><input type="checkbox" id="checkbox1960" name="checkbox1960" onclick="handleBox(1960)"></input>
 				<input type="checkbox" id="checkbox1961" name="checkbox1961" onclick="handleBox(1961)"></input>
 				<input type="checkbox" id="checkbox1962" name="checkbox1962" onclick="handleBox(1962)"></input>
 				<input type="checkbox" id="checkbox1963" name="checkbox1963" onclick="handleBox(1963)"></input>
@@ -2037,7 +2061,7 @@
 				<input type="checkbox" id="checkbox1977" name="checkbox1977" onclick="handleBox(1977)"></input>
 				<input type="checkbox" id="checkbox1978" name="checkbox1978" onclick="handleBox(1978)"></input>
 				<input type="checkbox" id="checkbox1979" name="checkbox1979" onclick="handleBox(1979)"></input>
-				</div><div id="row99" class="row filled" ><input type="checkbox" id="checkbox1980" name="checkbox1980" onclick="handleBox(1980)"></input>
+				</div><div id="row99" class="row" ><input type="checkbox" id="checkbox1980" name="checkbox1980" onclick="handleBox(1980)"></input>
 				<input type="checkbox" id="checkbox1981" name="checkbox1981" onclick="handleBox(1981)"></input>
 				<input type="checkbox" id="checkbox1982" name="checkbox1982" onclick="handleBox(1982)"></input>
 				<input type="checkbox" id="checkbox1983" name="checkbox1983" onclick="handleBox(1983)"></input>
@@ -2058,24 +2082,56 @@
 				<input type="checkbox" id="checkbox1998" name="checkbox1998" onclick="handleBox(1998)"></input>
 				<input type="checkbox" id="checkbox1999" name="checkbox1999" onclick="handleBox(1999)"></input>
 				</div>
-        <div id="filler"></div>
+                </div>
+                <div id="filler"></div>
+            </div>
+        </div>
     </div>
     <div id="counter">0</div>
     <script>
         var rowsScrolled = 0;
         // move the ckeckboxes down with the viewport and update a variable with the number of rows scrolled past the first row
-        window.onscroll = function() {
-            var rows = document.getElementsByClassName("row");
-            var row = rows[0];
-            var rowHeight = row.offsetHeight;
-            var rowTop = row.offsetTop;
-            var rowBottom = rowTop + rowHeight;
-            rowsScrolled = Math.max(0, Math.floor((window.scrollY - rowTop) / rowHeight));
-            // set the css transform property of all rows to move them down
-            document.documentElement.style.setProperty("--offsetRows", rowsScrolled);
-            var counter = document.getElementById("counter");
-            counter.innerHTML = rowsScrolled;
-            updateCheckBoxes();
+        // window.onscroll = function() {
+        //     var rows = document.getElementsByClassName("row");
+        //     var row = rows[0];
+        //     var rowHeight = row.offsetHeight;
+        //     var rowTop = row.offsetTop;
+        //     console.log(rowTop);
+        //     var rowBottom = rowTop + rowHeight;
+        //     rowsScrolled = Math.max(0, Math.floor((window.scrollY - rowTop) / rowHeight));
+        //     // set offsetRows in css
+        //     document.documentElement.style.setProperty("--offsetRows", rowsScrolled);
+        //     // set the top row position
+        //     // document.documentElement.style.setProperty("--topRowPos", rowTop + "px");
+        //     // set the counter
+        //     var counter = document.getElementById("counter");
+        //     counter.innerHTML = rowsScrolled;
+        //     updateCheckBoxes();
+        // }
+
+        // window.onscroll = function() {
+        //     // use getBoundingClientRect to get the position of the first row relative to the viewport
+        //     // then we can translate it down with css so that it stays at the top of the viewport
+        //     // TODO maybe later try sticky element
+        //     var mover = document.getElementById("mover");
+
+        //     var offTop = mover.getBoundingClientRect().top;
+
+        //     console.log(offTop);
+            
+
+        //     document.documentElement.style.setProperty("--directTranslate", offTop + "px");
+
+        // }
+
+        // Update the checkboxwidth in the css
+        window.onload = function() {
+            var checkbox0 = document.getElementById("checkbox0");
+            var chackbox1 = document.getElementById("checkbox1");
+            var checkbox0Pos = checkbox0.getBoundingClientRect();
+            var checkbox1Pos = chackbox1.getBoundingClientRect();
+            var checkboxWidth = checkbox1Pos.left - checkbox0Pos.left;
+            document.documentElement.style.setProperty("--checkboxWidth", checkboxWidth + "px");
         }
 
         // store the boolean state of all 1 million checkboxes
