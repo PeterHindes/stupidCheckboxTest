@@ -8,9 +8,12 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"math"
 
 	"github.com/gorilla/websocket"
 )
+
+// Handle WebSocket connections
 func handleWebSocket(w http.ResponseWriter, r *http.Request, bitArray *[1000000]bool) {
 	// Allow all origins
 	upgrader := websocket.Upgrader{
@@ -27,15 +30,26 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, bitArray *[1000000]
 	}
 	defer conn.Close()
 
-	// Send bitArray periodically
+	// Right after it opens send the full bitArray, the client will simply verify that the blob is the correct length because otherwise it is an rle encoded blob
+	err = sendBitArray(conn, bitArray[:])
+	if err != nil {
+		log.Println("Failed to send bitArray:", err)
+		return
+	}
+
+	// Send blankRunEncode(bitArray) periodically
 	go func() {
 		for {
 			time.Sleep(200 * time.Millisecond)
-			err := sendBitArray(conn, bitArray[:])
+			// Wait for the update of the encoded bitArray
+			<-encodedArrayMutex
+			log.Println("Sending encoded bitArray...")
+			err := sendBitArray(conn, encodedBitArray)
 			if err != nil {
 				log.Println("Failed to send bitArray:", err)
 				break
 			}
+			encodedArrayMutex <- true
 		}
 	}()
 
@@ -62,18 +76,35 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, bitArray *[1000000]
 		// Modify the boolean array based on the decoded message
 		if data.ID >= 0 && data.ID < len(bitArray) {
 			bitArray[data.ID] = data.State
+
+			// Add the change to the statistics
+			statisticsMutex <- true
+			if data.State {
+				statistics["true"]++
+			} else {
+				statistics["false"]++
+			}
+			<-statisticsMutex
 		}
 	}
 
 }
 func sendBitArray(conn *websocket.Conn, bitArray []bool) error {
 	// Encode the bitArray into a binary message without json
-	// convert bitArray to byte array
-	byteArray := make([]byte, len(bitArray)/8)
+	// Calculate the number of bytes needed to store the bit array
+	byteArraySize := int(math.Ceil(float64(len(bitArray)) / 8))
+	byteArray := make([]byte, byteArraySize)
 	for i := 0; i < len(bitArray); i++ {
 		if bitArray[i] {
 			byteArray[i/8] |= 1 << uint8(7-i%8)
 		}
+	}
+
+	// Handle the remaining bits TODO: Check if ai did a good job here
+	remainingBits := len(byteArray)*8 - len(bitArray)
+	if remainingBits > 0 {
+		byteArray[len(byteArray)-1] >>= uint8(remainingBits)
+		byteArray[len(byteArray)-1] <<= uint8(remainingBits)
 	}
 
 	// Send the bitArray
@@ -86,6 +117,21 @@ func sendBitArray(conn *websocket.Conn, bitArray []bool) error {
 }
 
 var bitArray [1000000]bool
+var encodedBitArray []bool
+var encodedArrayMutex = make(chan bool, 1)
+var statistics = make(map[string]int)
+var statisticsMutex = make(chan bool, 1)
+
+func updateEncodedBitArray() {
+	// Lock the mutex
+	<-encodedArrayMutex
+
+	// Encode the bitArray
+	encodedBitArray = blankRunEncode(bitArray[:], 5)
+
+	// Unlock the mutex
+	encodedArrayMutex <- true
+}
 
 func main() {
 
@@ -117,8 +163,30 @@ func main() {
 			time.Sleep(5 * time.Second)
 			saveBinaryFile(bitArray[:], "bitArray.bin")
 			log.Println("BitArray saved to bitArray.bin")
+			// Also save the statistics to a json file
+			statisticsMutex <- true
+			file, err := os.Create("statistics.json")
+			if err != nil {
+				log.Println("Failed to create statistics file:", err)
+			} else {
+				encoder := json.NewEncoder(file)
+				err = encoder.Encode(statistics)
+				if err != nil {
+					log.Println("Failed to encode statistics:", err)
+				}
+				file.Close()
+			}
 		}
 	}()
+
+	// Every 200 milliseconds, update the encoded bitArray
+	go func() {
+		for {
+			time.Sleep(200 * time.Millisecond)
+			updateEncodedBitArray()
+		}
+	}()
+
 
 	// Register WebSocket handler
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -186,4 +254,103 @@ func loadBinaryFile(array *[1000000]bool, filename string) error {
 		}
 	}
 	return nil
+}
+
+// Custom RLE encoding function
+func blankRunEncode(array []bool, powerOfTwo int) []bool {
+	// Calculate the length of array
+	arraySize := len(array)
+	// Create a new array for the runs
+	runs := make([]int, 0)
+	// Create a new array for the end values
+	ends := make([]bool, 0)
+
+	// keep track of our current run
+	run := 0
+	// loop through the input array to find zeros
+	for i := 0; i < arraySize; i++ {
+		if (array[i] == false) {
+			run++
+		} else {
+			runs = append(runs, run)
+			run = 0
+			ends = append(ends, array[i])
+		}
+	}
+	// Handle the case where the last run is a zero run
+	if run > 0 {
+		runs = append(runs, run-1)
+		ends = append(ends, false)
+	}
+
+	powerInt := int(math.Pow(2, float64(powerOfTwo)))
+
+	// Split runs longer than nearest power of two into multiple runs (the first of witch must have and end of false and the second stays true)
+	// This requires looping through the runs array and checking if the run is longer than the power of two
+	// if it is then we will split it into two runs
+	newRuns := make([]int, 0)
+	newEnds := make([]bool, 0)
+	for i := 0; i < len(runs); i++ {
+		newestRuns, newestEnds := splitByPowerOfTwo(runs[i], powerInt, ends[i])
+		newRuns = append(newRuns, newestRuns...)
+		newEnds = append(newEnds, newestEnds...)
+	}
+
+
+	// From below just encodes using the powerOfTwo and the newRuns and newEnds arrays
+
+	// Create a new array for the change encoding
+	// first 5 bits used to store the power of two we are using for max run length
+	// then the data payload
+	// the data payload consists of a number represented by (power of two) bits followed by a bit to indicate of that run ends with a true or false
+	// the data payload is repeated until the end of the array that it represents
+	encoded := make([]bool, 0)
+
+	// convert the power of two to a boolean array and append them to the encoded array
+	// 5 bits
+	for j := 4; j >= 0; j-- {
+		encoded = append(encoded, (powerOfTwo>>j)&1 == 1)
+	}
+
+	// loop through the alligned newRuns and newEnds arrays to encode the data
+	for i := 0; i < len(newRuns); i++ {
+	// for i := 0; i < 3; i++ {
+		// convert the run to a boolean array and append them to the encoded array
+		for j := powerOfTwo - 1; j >= 0; j-- {
+			encoded = append(encoded, (newRuns[i]>>j)&1 == 1)
+		}
+
+		// then insert the current value of the array
+		encoded = append(encoded, newEnds[i])
+	}
+
+	// Print the size diffrence between the two arrays
+	// fmt.Println()
+	// fmt.Println("Original array size:", arraySize)
+	// fmt.Println("Encoded array size:  ", len(encoded))
+
+
+	
+
+	return encoded
+
+}
+
+// Recursive function to split a run into multiple runs
+func splitByPowerOfTwo(run, power int, end bool) ([]int, []bool) {
+	// Check if the run is smaller than the power of two
+	if run <= power {
+		return []int{run}, []bool{end}
+	}
+
+	// Split the run into two
+	runs := make([]int, 0)
+	ends := make([]bool, 0)
+	runs = append(runs, power-1)
+	ends = append(ends, false)
+	newRuns, newEnds := splitByPowerOfTwo(run-power+1, power, end)
+	runs = append(runs, newRuns...)
+	ends = append(ends, newEnds...)
+
+	return runs, ends
 }
