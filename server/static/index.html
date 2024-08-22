@@ -95,6 +95,10 @@
         var totalRows = 1;
         // move the ckeckboxes down with the viewport and update a variable with the number of rows scrolled past the first row
         window.onscroll = function() {
+            while (!loaded) {
+                // Sleep 10ms and try again
+                setTimeout(() => {}, 10);
+            }
             var rows = document.getElementsByClassName("row");
             var row = rows[0];
             var rowHeight = row.offsetHeight;
@@ -133,6 +137,7 @@
         // }
 
         // Update the checkboxwidth in the css
+        var loaded = false;
         window.onload = function() {
 
             fillWithBoxes();
@@ -146,6 +151,8 @@
             document.documentElement.style.setProperty("--checkboxWidth", checkboxWidth + "px");
             
             openWebsocket();
+
+            loaded = true;
         }
         window.onresize = function() {
             fillWithBoxes();
@@ -195,12 +202,24 @@
             }
         }
 
+        
+        function getWsUrl() {
+            var proto = window.location.protocol
+            var wsproto = proto === "https:" ? "wss:" : "ws:";
+            var wsurl = wsproto + "//" + window.location.host + "/ws";
+            return wsurl;
+        }
+        // const wsurl = "wss://publdev.abad.cc/ws";
+        // const wsurl = "ws://localhost:1335/ws";
+        // const wsurl = "ws://baredev.abad.cc/ws";
+        var wsurl = getWsUrl();
+
         var ws = null;
         var messageQueue = [];
         // retry should be a callback function to rerun after the websocket is opened
         function openWebsocket() {
             if (ws === null || ws.readyState === 3) {
-                ws = new WebSocket("ws://quick.peterhindes.com");
+                ws = new WebSocket(wsurl);
                 ws.binaryType = "arraybuffer";
                 ws.onopen = function() {
                     console.log("Websocket opened");
@@ -261,6 +280,8 @@
             // Send the state of the checkbox to the server
             messageQueue.push({id: inx, state: box.checked});
             sendMessages();
+
+            console.log("Set box",id,"To",box.checked,"from index",inx);
         }
     </script>
 </body>

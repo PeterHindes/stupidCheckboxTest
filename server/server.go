@@ -113,12 +113,15 @@ func main() {
 	}()
 
 	// Register WebSocket handler
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		handleWebSocket(w, r, &bitArray)
 	})
 
+	// Serve static files
+	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("static"))))
+
 	// Start server
-	addr := ":1337"
+	addr := ":1335"
 	log.Println("Starting server on", addr)
 	errsrv := http.ListenAndServe(addr, nil)
 	if errsrv != nil {
@@ -162,20 +165,17 @@ func loadBinaryFile(array *[1000000]bool, filename string) error {
 	defer file.Close()
 
 	// Read the file
-	data := make([]byte, 1)
-	for {
-		_, err := file.Read(data)
+	for i := 0; i < len(array); i += 8 {
+		byteArray := make([]byte, 1)
+		_, err := file.Read(byteArray)
 		if err != nil {
-			break
+			return err
 		}
-		for i := 0; i < 8; i++ {
-			if data[0]&(1<<uint8(7-i)) != 0 {
-				array[i] = true
-			} else {
-				array[i] = false
-			}
+
+		for j := 0; j < 8 && i+j < len(array); j++ {
+			bit := (byteArray[0] >> uint8(7-j)) & 1
+			array[i+j] = bit == 1
 		}
 	}
-
 	return nil
 }
