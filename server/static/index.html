@@ -240,13 +240,42 @@
                     if (event.data instanceof ArrayBuffer) {
                         const data = new Uint8Array(event.data);
 
-                        // Update the checkStates array with the new data
-                        for (let i = 0; i < data.length/8; i++) {
-                            for (let j = 0; j < 8; j++) {
-                                const inx = i*8 + j;
-                                checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
+                        // Check that the data is 1 million bits long
+                        if (data.length !== 1000000/8) {
+                            // If its not we are using the custom rle encoding
+                            // Update the checkStates array with the new data using the custom rle encoding
+                            // instantiate a new array to store the decoded changes array which indicates which boxes should be toggled (flipped to opposite state)
+                            let changes = new Array(1000000).fill(false);
+                            // Decode the blankRunEncoded data
+                            var decodedChanges = [];
+                            var currentIndex = 0;
+                            while (currentIndex < data.length) {
+                                // Read the power of two from the first 5 bits
+                                var powerOfTwo = 0;
+                                for (var i = 0; i < 5; i++) {
+                                    powerOfTwo = (powerOfTwo << 1) | (data[currentIndex++] ? 1 : 0);
+                                }
+
+                                console.log(`Power of two: ${powerOfTwo}`);
+                                
+                                // Read the runs and ends from the remaining bits
+                                
+                            }
+
+                            // Update the checkStates array with the decoded changes
+                            for (var i = 0; i < decodedChanges.length; i++) {
+                                checkStates[i + rowsScrolled * 20] = !checkStates[i + rowsScrolled * 20];
+                            }
+                        } else {
+                            // Update the checkStates array with the new data using a full frame
+                            for (let i = 0; i < data.length/8; i++) {
+                                for (let j = 0; j < 8; j++) {
+                                    const inx = i*8 + j;
+                                    checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
+                                }
                             }
                         }
+
                         updateCheckBoxes();
 
                         // // Get the first byte (8 bits)
