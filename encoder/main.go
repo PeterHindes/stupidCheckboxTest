@@ -53,22 +53,20 @@ func main() {
 	// elapsed := time.Since(start)
 	// fmt.Println("Elapsed time:", elapsed)
 
+	// Encode the differences using RLE with a max run length of 2^6
 	encodeddiff := blankRunEncode(arraydiff, 6)
 
 	// Save to binary file
 	saveBinaryFile(arraydiff, "diff.bin")
 	saveBinaryFile(encodeddiff, "ediff.bin")
 
-	// // Print the rle encoded arrays
-	// printRle("Negative Differences", encodednegdiff)
-	// printRle("Positive Differences", encodedposdiff)
-
-
+/*
 	// Turn the results into a png image
 	// Create a new image
 	img := createImage(arraynegdiff, arrayposdiff, 100, arraySize)
 	// Save the image to a file
 	saveImage(img, "diff.png")
+*/
 }
 
 // Import a csv file which contains the best run lengths for each number of changes, the position in the csv file represents the number of changes and needs to be multiplied by the prescan resolution which is currently 50

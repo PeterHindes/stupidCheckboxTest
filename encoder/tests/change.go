@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"math"
 	"os"
-	_"sync"
+	"sync"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -35,105 +35,112 @@ func main() {
 	// 	array[i] = bit == 1
 	// }
 
-/*
 
-	// Sweep the average parameter between 1 and 1000000
-	// track the sizes of the encoded arrays
-	// print the sizes of the encoded arrays
-	// print the smallest size and the average that produced it
-	sizes := make([][]int, 200)
-	for i := 0; i < 200; i++ {
-		sizes[i] = make([]int, 500000/50)
-		// for j := 0; j < 10000; j++ {
-		// 	sizes[i][j] = arraySize
-		// }
+
+	// Sweep the power of two and the number of changes
+
+	// Create a 2D array to store the sizes
+	// make constants for the step size and max for each parameter
+	const powerStepSize = 2
+	const maxPower = 20
+	const initialPower = 2
+	const changesStepSize = 1000
+	const maxChanges = 1000000
+
+	sizes := make([][]int, maxPower/powerStepSize+1)
+	for i := 0; i < maxPower/powerStepSize+1; i++ {
+		sizes[i] = make([]int, maxChanges/changesStepSize+1)
 	}
 
+	numberOfThreadsThatWillRun := (maxPower/powerStepSize) * (maxChanges/changesStepSize)
+
 	var wg sync.WaitGroup
-	maxThreads := 2000
+	const maxThreads = 500
 	threadCount := 0
+	completedThreads := 0
 
-	for i := 4; i < 2000; i += 10 {
-		j := 0
-		wg.Add(1)
-		go func(runlen, changes int) {
-			x := (runlen - 4) / 10
-			y := changes / 50
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Println()
-					// Handle the panic here or ignore it
-					fmt.Println("Recovered from panic:", r)
-					fmt.Println("X:", x, "Y:", y)
-				}
-				wg.Done()
-			}()
-			array := createChanges(arraySize, changes)
-			// Print the changes array
-			// fmt.Println("Changes array:", array)
+	for i := initialPower; i <= maxPower; i += powerStepSize {
+		for j := 0; j <= maxChanges; j+= changesStepSize {
+			wg.Add(1)
+			go func(powerOfTwo, changes int) {
+				x := (powerOfTwo - initialPower) / powerStepSize
+				y := changes / changesStepSize
+				defer func() {
+					if r := recover(); r != nil {
+						fmt.Println()
+						// Handle the panic here or ignore it
+						fmt.Println("Recovered from panic:", r)
+						fmt.Println("X:", x, "Y:", y)
+					}
+					wg.Done()
+				}()
+				array := createChanges(arraySize, changes)
+				sizes[x][y] = countRuns(array, powerOfTwo)
+				// fmt.Print("r", powerOfTwo, "f", changes, " ")
+			}(i, j)
 
-			sizes[x][y] = countRuns(array, float64(runlen))
-			fmt.Print("r", runlen, "f", changes, " ")
-		}(i, j)
-
-		threadCount++
-		if threadCount >= maxThreads {
-			wg.Wait()
-			threadCount = 0
+			threadCount++
+			if threadCount == maxThreads {
+				wg.Wait()
+				completedThreads += threadCount
+				threadCount = 0
+				fmt.Println(float64(completedThreads*100)/float64(numberOfThreadsThatWillRun), "% Complete")
+			}
 		}
 	}
 
 	wg.Wait()
+
+/*
 	// find min
 	min := arraySize
 	minIndex := make([]int, 2)
-	for i := 0; i < 200; i++ {
-		for j := 0; j < 500000/50; j++ {
+	for i := 0; i < maxPower/powerStepSize; i+= powerStepSize {
+		for j := 0; j < maxChanges/changesStepSize; j+= changesStepSize {
 			if sizes[i][j] < min {
 				min = sizes[i][j]
-				minIndex[0] = i*10+4
-				minIndex[1] = j*50
+				minIndex[0] = i*powerStepSize+initialPower
+				minIndex[1] = j*changesStepSize
 			}
 		}
 	}
 	fmt.Println("Smallest size of encoded array:", min)
 	fmt.Println("Average run length that produced the smallest size:", minIndex[0], "\nChanges that produced the smallest size:", minIndex[1])
-
-	
-
-	// array := createChanges(arraySize, 61370)
-	// size := countRuns(array, 4)
-	// fmt.Println("Size of encoded array:", size)
-
-	// Generate the bar graph
-	// barGraph(goodSizes, goodSizePositons)
+*/
 
 	// Save to xls file
-	saveToXLS(sizes)
+	saveToXLS(sizes, initialPower, maxPower, powerStepSize, maxChanges, changesStepSize)
 
-	*/
 
+/*
 	array := createChanges(arraySize, 0)
 
-	len := countRuns(array, 1000000)
+	len := countRuns(array, 20)
 	
 	fmt.Println("Size of encoded array:", len)
+*/
 }
 
 func createChanges(arraySize, changes int) []bool {
 	// Create two boolean arrays
 	array1 := make([]bool, arraySize)
-	// array2 := make([]bool, arraySize)
 
 	// Fill the arrays with random data
 	fillRandomData(array1)
-	// fillRandomData(array2)
 
 	// create array2 as a copy of array1 with 
 	array2 := make([]bool, arraySize)
 	copy(array2, array1)
+	// Change random bits in array2
+	// Make sure that we only change a bit once, every change is unique
+	changedBits := make(map[int]bool)
 	for i := 0; i < changes; i++ {
-		array2[rand.Intn(arraySize)] = !array2[rand.Intn(arraySize)]
+		index := rand.Intn(arraySize)
+		for changedBits[index] {
+			index = rand.Intn(arraySize)
+		}
+		array2[index] = !array2[index]
+		changedBits[index] = true
 	}
 
 	// Calculate the differences between the two arrays
@@ -150,14 +157,6 @@ func createChanges(arraySize, changes int) []bool {
 	arraydiff := make([]bool, arraySize)
 	for i := 0; i < arraySize; i++ {
 		arraydiff[i] = arraynegdiff[i] || arrayposdiff[i]
-	}
-
-	// Print the last bit of the combined array
-	fmt.Print("Array diff: ")
-	if arraydiff[arraySize-1] {
-		fmt.Println("Change")
-	} else {
-		fmt.Println("No Change")
 	}
 
 	return arraydiff
@@ -197,38 +196,6 @@ func countRuns(array []bool, powerOfTwo int) int {
 		ends = append(ends, false)
 	}
 
-	// // Print the first 10 runs
-	// fmt.Println("Runs:", runs[:10])
-	// fmt.Println("Ends:", ends[:10])
-	// Print all runs
-	fmt.Println("Runs:", runs)
-	fmt.Println("Ends:", ends)
-
-	// // Find the average run length
-	// total := 0
-	// for i := 0; i < len(runs); i++ {
-	// 	total += runs[i]
-	// }
-	// average := float64(total) / float64(len(runs))
-	// fmt.Println("Average run length:", average)
-
-	// // Find the nearest power of two to the average
-	// lastPower := 1.0
-	// power := 2.0
-	// for power < average {
-	// 	lastPower = power
-	// 	power *= 2
-	// }
-	// if (average - lastPower) < (power - average) {
-	// 	power = lastPower
-	// }
-	// powerInt := int(power)
-	// // fmt.Println("Nearest power of two:", powerInt)
-	
-	// // convert the powerInt to an int representing the power of two
-	// powerOfTwo := int(math.Log2(float64(powerInt)))
-	// // fmt.Println("Power of two:", powerOfTwo)
-
 	powerInt := int(math.Pow(2, float64(powerOfTwo)))
 
 	// Split runs longer than nearest power of two into multiple runs (the first of witch must have and end of false and the second stays true)
@@ -261,9 +228,6 @@ func countRuns(array []bool, powerOfTwo int) int {
 		encoded = append(encoded, (powerOfTwo>>j)&1 == 1)
 	}
 
-	// Print the array so far for debuging
-	fmt.Println("Encoded array so far:", encoded)
-
 	// loop through the alligned newRuns and newEnds arrays to encode the data
 	for i := 0; i < len(newRuns); i++ {
 	// for i := 0; i < 3; i++ {
@@ -276,12 +240,7 @@ func countRuns(array []bool, powerOfTwo int) int {
 		encoded = append(encoded, newEnds[i])
 	}
 
-	// Print the size diffrence between the two arrays
-	// fmt.Println()
-	// fmt.Println("Original array size:", arraySize)
-	// fmt.Println("Encoded array size:  ", len(encoded))
-
-
+/*
 	fmt.Println("The power of two:", powerOfTwo)
 	fmt.Println("The encoded array:")
 	for i := 0; i < len(encoded); i++ {
@@ -309,6 +268,7 @@ func countRuns(array []bool, powerOfTwo int) int {
 		}
 	}
 	fmt.Println("")
+*/
 
 	// // print the last bit of the array
 	// if array[len(array)-1] {
@@ -320,6 +280,8 @@ func countRuns(array []bool, powerOfTwo int) int {
 	return len(encoded)
 
 }
+
+/*
 
 // Recursive function to split a run into multiple runs
 func splitByPowerOfTwo(run, power int, end bool) ([]int, []bool) {
@@ -339,6 +301,26 @@ func splitByPowerOfTwo(run, power int, end bool) ([]int, []bool) {
 
 	return runs, ends
 }
+
+*/
+
+// Iterative function to split a run into multiple runs
+func splitByPowerOfTwo(run, power int, end bool) ([]int, []bool) {
+	runs := make([]int, 0)
+	ends := make([]bool, 0)
+
+	for run > power {
+		runs = append(runs, power-1)
+		ends = append(ends, false)
+		run -= power - 1
+	}
+
+	runs = append(runs, run)
+	ends = append(ends, end)
+
+	return runs, ends
+}
+
 
 // print the changeEncoded runs
 // we should print them in this format
@@ -409,7 +391,7 @@ func saveBinaryFile(array []bool, filename string) {
 }
 
 
-func saveToXLS(sizes [][]int) {
+func saveToXLS(sizes [][]int, initialPower, maxPower, powerStepSize, maxChanges, changesStepSize int) {
 	// Create a new excel file
 	f := excelize.NewFile()
 
@@ -422,16 +404,20 @@ func saveToXLS(sizes [][]int) {
 	}
 
 	// Set the value of the cell
-	f.SetCellValue("Sheet1", "A1", "Average Run Length")
+	f.SetCellValue("Sheet1", "A1", "Power Of Two")
 	f.SetCellValue("Sheet1", "B1", "Changes")
 	f.SetCellValue("Sheet1", "C1", "Encoded Array Size")
 	
 	// Fill the sheet with the data
-	for i := 0; i < 200; i++ {
-		for j := 0; j < 500000/50; j++ {
-			f.SetCellValue("Sheet1", fmt.Sprintf("A%d", i*500000/50+j+2), i*10+4)
-			f.SetCellValue("Sheet1", fmt.Sprintf("B%d", i*500000/50+j+2), j*50)
-			f.SetCellValue("Sheet1", fmt.Sprintf("C%d", i*500000/50+j+2), sizes[i][j])
+	vert := 1
+	for i := 0; i < len(sizes); i++ {
+		fmt.Println("Power In Sheet ",i)
+		for j := 0; j < len(sizes[i]); j++ {
+			vert += 1
+			encSize := sizes[i][j]
+			f.SetCellValue("Sheet1", fmt.Sprintf("A%d", vert), i*powerStepSize+initialPower)
+			f.SetCellValue("Sheet1", fmt.Sprintf("B%d", vert), j*changesStepSize)
+			f.SetCellValue("Sheet1", fmt.Sprintf("C%d", vert), encSize)
 		}
 	}
 

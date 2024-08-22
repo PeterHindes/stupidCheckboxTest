@@ -8,26 +8,38 @@
         body {
             margin: 10px;
             min-width: calc(456px+20px);
+            background-color: rgb(44, 34, 77);
+        }
+        #flexCenter {
+            min-width: 540px;
+            display: flex;
+            justify-content: center;
         }
         #content {
-            margin: 0 auto;
-            /* width: 400px; */
-            width: fit-content;
-            min-width: 416px;
+            margin: 0;
+            width: 480px;
             background-color: beige;
             padding: 20px;
             border-radius: 10px;
+        }
+        #clipper {
+            overflow: hidden;
+            width: calc(var(--checkboxWidth) * 20);
+            padding: 0;
+            margin: 0;
         }
         .row {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 19px;
+            overflow: hidden;
+            text-overflow: clip;
         }
-        input[type="checkbox"] {
+        /* input[type="checkbox"] {
             padding: 0;
             margin: 2px;
-        }
+        } */
 
         #counter {
             position: fixed;
@@ -40,42 +52,132 @@
             text-align: center;
         }
 
-        :root {
-            --row-height: 19px;
-            --offsetRows: 0;
-        }
-
-        .filled {
-            transform: translate3d(0,calc(var(--offsetRows) * var(--row-height)),0);
+        #mover {
+            transform: translate3d(0,calc((var(--offsetRows)) * var(--row-height)),0);
+            /* transform: translate3d(0,var(--directTranslate),0); */
+            position: sticky;
+            top: 0px;
+            padding: 0;
+            margin: 0;
         }
 
         #filler {
             height: calc(var(--row-height) * 49900);
+            padding: 0;
+            margin: 0;
         }
+
+        :root {
+            --row-height: 19px;
+            --offsetRows: 0;
+            /* --directTranslate: 0; */
+            /* --topRowPos: 0px; */
+            --checkboxWidth: 20px;
+        }
+
     </style>
 </head>
 <body>
     <h1>this is stupid</h1>
-    <div id="content">
-        {{checkbox}}
-        <div id="filler"></div>
+    <div id="flexCenter">
+        <div id="content">
+            <div id="clipper">
+                <div id="mover">
+                    <!-- {{checkbox}} -->
+                </div>
+                <div id="filler"></div>
+            </div>
+        </div>
     </div>
     <div id="counter">0</div>
     <script>
         var rowsScrolled = 0;
+        var totalRows = 1;
         // move the ckeckboxes down with the viewport and update a variable with the number of rows scrolled past the first row
         window.onscroll = function() {
             var rows = document.getElementsByClassName("row");
             var row = rows[0];
             var rowHeight = row.offsetHeight;
-            var rowTop = row.offsetTop;
+            var rowTop = 0;
+            var currentElement = row;
+            while (currentElement !== document.body) {
+                rowTop += currentElement.offsetTop;
+                currentElement = currentElement.offsetParent;
+            }
+            // console.log(rowTop);
             var rowBottom = rowTop + rowHeight;
             rowsScrolled = Math.max(0, Math.floor((window.scrollY - rowTop) / rowHeight));
-            // set the css transform property of all rows to move them down
+            // set offsetRows in css
             document.documentElement.style.setProperty("--offsetRows", rowsScrolled);
+            // set the top row position
+            // document.documentElement.style.setProperty("--topRowPos", rowTop + "px");
+            // set the counter
             var counter = document.getElementById("counter");
             counter.innerHTML = rowsScrolled;
             updateCheckBoxes();
+        }
+
+        // window.onscroll = function() {
+        //     // use getBoundingClientRect to get the position of the first row relative to the viewport
+        //     // then we can translate it down with css so that it stays at the top of the viewport
+        //     // TODO maybe later try sticky element
+        //     var mover = document.getElementById("mover");
+
+        //     var offTop = mover.getBoundingClientRect().top;
+
+        //     console.log(offTop);
+            
+
+        //     document.documentElement.style.setProperty("--directTranslate", offTop + "px");
+
+        // }
+
+        // Update the checkboxwidth in the css
+        window.onload = function() {
+
+            fillWithBoxes();
+
+            // Fill in css vars
+            var checkbox0 = document.getElementById("checkbox0");
+            var chackbox1 = document.getElementById("checkbox1");
+            var checkbox0Pos = checkbox0.getBoundingClientRect();
+            var checkbox1Pos = chackbox1.getBoundingClientRect();
+            var checkboxWidth = checkbox1Pos.left - checkbox0Pos.left;
+            document.documentElement.style.setProperty("--checkboxWidth", checkboxWidth + "px");
+            
+            openWebsocket();
+        }
+        window.onresize = function() {
+            fillWithBoxes();
+        }
+
+        function fillWithBoxes() {
+            generateDomBoxes(1);
+            // Find the height of the row and the height of the viewport
+            var row = document.getElementById("row0");
+            var rowHeight = row.offsetHeight;
+            var viewportHeight = window.innerHeight;
+            // Find the number of rows that fit in the viewport
+            totalRows = Math.ceil(viewportHeight / rowHeight);
+            // Redo it with the right number of rows
+            generateDomBoxes(totalRows);
+        }
+
+        function generateDomBoxes(rows) {
+            // Generate checkboxes
+            const rowLength = 20;
+            var checkboxes = "";
+            for (let j = 0; j < rows; j++) {
+                checkboxes += `<div id="row${j}" class="row" >`;
+                for (let i = 0; i < rowLength; i++) {
+                    let inx = 20 * j + i;
+                    checkboxes += `
+                        <input type="checkbox" id="checkbox${inx}" name="checkbox${inx}" onclick="handleBox(${inx})"></input>
+                    `;
+                }
+                checkboxes += "</div>";
+            }
+            document.getElementById("mover").innerHTML = checkboxes;
         }
 
         // store the boolean state of all 1 million checkboxes
@@ -83,16 +185,82 @@
 
         // handle updating the checkBoxes in the dom when the user scrolls
         function updateCheckBoxes() {
-            for (var i = 0; i < 2000; i++) {
+            // console.log("Updating checkboxes");
+            
+            for (var i = 0; i < totalRows*20; i++) {
                 var box = document.getElementById(`checkbox${i}`);
                 box.checked = checkStates[i + rowsScrolled*20];
+                // console.log("Set box",i,"To",checkStates[i + rowsScrolled*20],"from index",i + rowsScrolled*20);
+                
+            }
+        }
+
+        var ws = null;
+        var messageQueue = [];
+        // retry should be a callback function to rerun after the websocket is opened
+        function openWebsocket() {
+            if (ws === null || ws.readyState === 3) {
+                ws = new WebSocket("ws://quick.peterhindes.com");
+                ws.binaryType = "arraybuffer";
+                ws.onopen = function() {
+                    console.log("Websocket opened");
+                    // Push all the messages in the queue
+                    sendMessages();
+                }
+                ws.onmessage = function(event) {
+                    if (event.data instanceof ArrayBuffer) {
+                        const data = new Uint8Array(event.data);
+
+                        // Update the checkStates array with the new data
+                        for (let i = 0; i < data.length/8; i++) {
+                            for (let j = 0; j < 8; j++) {
+                                const inx = i*8 + j;
+                                checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
+                            }
+                        }
+                        updateCheckBoxes();
+
+                        // // Get the first byte (8 bits)
+                        // const firstByte = data[0];
+
+                        // // Convert to binary string and pad with leading zeros if necessary
+                        // const first8Bits = firstByte.toString(2).padStart(8, '0');
+                        
+                        // console.log(`First 8 bits: ${first8Bits}`);
+                    } else {
+                        // text frame
+                        console.log(event.data);
+                    }
+                }
+                ws.onclose = function() {
+                    console.log("Websocket closed");
+                    openWebsocket();
+                }
+            } else if (ws.readyState === 0) {
+                console.log("Websocket not open yet");
+            } else if (ws.readyState === 1) {
+                console.log("Websocket already open");
+            }
+        }
+
+        function sendMessages() {
+            if (ws.readyState === 1) {
+                while (messageQueue.length > 0) {
+                    var message = messageQueue.shift();
+                    ws.send(JSON.stringify(message));
+                }
             }
         }
 
         function handleBox(id) {
             var box = document.getElementById(`checkbox${id}`);
-            console.log(id+rowsScrolled*20,box.checked);
-            checkStates[id+rowsScrolled*20] = box.checked;
+            var inx = id+rowsScrolled*20
+            // console.log(inx,box.checked);
+            checkStates[inx] = box.checked;
+
+            // Send the state of the checkbox to the server
+            messageQueue.push({id: inx, state: box.checked});
+            sendMessages();
         }
     </script>
 </body>
