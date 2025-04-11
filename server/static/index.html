@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stupid Checkbox</title>
+    <title>Checkbox Grid</title>
     <style>
         body {
             margin: 10px;
@@ -41,17 +41,6 @@
             margin: 2px;
         } */
 
-        #counter {
-            position: fixed;
-            top: 5px;
-            right: 5px;
-            background-color: lightblue;
-            padding: 10px;
-            border-radius: 10px;
-            width: 100px;
-            text-align: center;
-        }
-
         #mover {
             transform: translate3d(0,calc((var(--offsetRows)) * var(--row-height)),0);
             /* transform: translate3d(0,var(--directTranslate),0); */
@@ -62,7 +51,7 @@
         }
 
         #filler {
-            height: calc(var(--row-height) * 49900);
+            height: calc(var(--row-height) * var(--total-rows));
             padding: 0;
             margin: 0;
         }
@@ -70,15 +59,13 @@
         :root {
             --row-height: 19px;
             --offsetRows: 0;
-            /* --directTranslate: 0; */
-            /* --topRowPos: 0px; */
             --checkboxWidth: 20px;
+            --total-rows: 0;
         }
 
     </style>
 </head>
 <body>
-    <h1>this is stupid</h1>
     <div id="flexCenter">
         <div id="content">
             <div id="clipper">
@@ -89,8 +76,15 @@
             </div>
         </div>
     </div>
-    <div id="counter">0</div>
     <script>
+        const DEBUG = false; // Toggle this for production
+
+        function log(...args) {
+            if (DEBUG) {
+                console.log(...args);
+            }
+        }
+
         var rowsScrolled = 0;
         var totalRows = 1;
         // move the ckeckboxes down with the viewport and update a variable with the number of rows scrolled past the first row
@@ -116,8 +110,6 @@
             // set the top row position
             // document.documentElement.style.setProperty("--topRowPos", rowTop + "px");
             // set the counter
-            var counter = document.getElementById("counter");
-            counter.innerHTML = rowsScrolled;
             updateCheckBoxes();
         }
 
@@ -156,6 +148,7 @@
         }
         window.onresize = function() {
             fillWithBoxes();
+            updateCheckBoxes(); // Add this line to restore checkbox states after resize
         }
 
         function fillWithBoxes() {
@@ -187,8 +180,9 @@
             document.getElementById("mover").innerHTML = checkboxes;
         }
 
-        // store the boolean state of all 1 million checkboxes
-        var checkStates = new Array(1000000).fill(false);
+        // store the boolean state of all checkboxes (size will be set when connecting)
+        var checkStates = [];
+        var boardSize = 0;
 
         // handle updating the checkBoxes in the dom when the user scrolls
         function updateCheckBoxes() {
@@ -226,78 +220,54 @@
         });
         // retry should be a callback function to rerun after the websocket is opened
         function openWebsocket() {
-            console.log("Opening websocket");
+            log("Opening websocket");
             
             if (ws === null || ws.readyState === 3) {
                 ws = new WebSocket(wsurl);
                 ws.binaryType = "arraybuffer";
                 ws.onopen = function() {
-                    console.log("Websocket opened");
-                    // Push all the messages in the queue
-                    sendMessages();
+                    log("Websocket opened");
+                    // Initial state will be sent by server
                 }
                 ws.onmessage = function(event) {
-                    if (event.data instanceof ArrayBuffer) {
-                        const data = new Uint8Array(event.data);
-
-                        // Check that the data is 1 million bits long
-                        if (data.length !== 1000000/8) {
-                            // If its not we are using the custom rle encoding
-                            // Update the checkStates array with the new data using the custom rle encoding
-                            // instantiate a new array to store the decoded changes array which indicates which boxes should be toggled (flipped to opposite state)
-                            let changes = new Array(1000000).fill(false);
-                            // Decode the blankRunEncoded data
-                            var decodedChanges = [];
-                            var currentIndex = 0;
-                            while (currentIndex < data.length) {
-                                // Read the power of two from the first 5 bits
-                                var powerOfTwo = 0;
-                                for (var i = 0; i < 5; i++) {
-                                    powerOfTwo = (powerOfTwo << 1) | (data[currentIndex++] ? 1 : 0);
-                                }
-
-                                console.log(`Power of two: ${powerOfTwo}`);
-                                
-                                // Read the runs and ends from the remaining bits
-                                
-                            }
-
-                            // Update the checkStates array with the decoded changes
-                            for (var i = 0; i < decodedChanges.length; i++) {
-                                checkStates[i + rowsScrolled * 20] = !checkStates[i + rowsScrolled * 20];
-                            }
-                        } else {
-                            // Update the checkStates array with the new data using a full frame
-                            for (let i = 0; i < data.length/8; i++) {
-                                for (let j = 0; j < 8; j++) {
-                                    const inx = i*8 + j;
+                    const data = new Uint8Array(event.data);
+                    
+                    if (data[0] === 1) { // board size message
+                        boardSize = (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | data[4];
+                        checkStates = new Array(boardSize).fill(false);
+                        // Update total rows for filler
+                        document.documentElement.style.setProperty("--total-rows", Math.ceil(boardSize / 20));
+                        log("Board size set to:", boardSize);
+                        sendMessages();
+                    } else if (data[0] === 0) { // checkbox change from another client
+                        const id = (data[1] << 16) | (data[2] << 8) | data[3];
+                        const state = data[4] !== 0;
+                        if (id < boardSize) {
+                            checkStates[id] = state;
+                            updateCheckBoxes();
+                            log("Received forwarded change:", { id, state });
+                        }
+                    } else { // full board state
+                        for (let i = 0; i < data.length; i++) {
+                            for (let j = 0; j < 8; j++) {
+                                const inx = i*8 + j;
+                                if (inx < boardSize) {
                                     checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
                                 }
                             }
                         }
-
                         updateCheckBoxes();
-
-                        // // Get the first byte (8 bits)
-                        // const firstByte = data[0];
-
-                        // // Convert to binary string and pad with leading zeros if necessary
-                        // const first8Bits = firstByte.toString(2).padStart(8, '0');
-                        
-                        // console.log(`First 8 bits: ${first8Bits}`);
-                    } else {
-                        // text frame
-                        console.log(event.data);
+                        log("Received full board update");
                     }
                 }
                 ws.onclose = function() {
-                    console.log("Websocket closed");
+                    log("Websocket closed");
                     setTimeout(openWebsocket, 1000);
                 }
             } else if (ws.readyState === 0) {
-                console.log("Websocket not open yet");
+                log("Websocket not open yet");
             } else if (ws.readyState === 1) {
-                console.log("Websocket already open");
+                log("Websocket already open");
             }
         }
 
@@ -305,9 +275,15 @@
             if (ws.readyState === 1) {
                 while (messageQueue.length > 0) {
                     var message = messageQueue.shift();
-                    ws.send(JSON.stringify(message));
+                    // Convert to binary message: type (1) + index (3 bytes) + state (1)
+                    var bytes = new Uint8Array(5);
+                    bytes[0] = 0; // type 0 = checkbox change
+                    bytes[1] = (message.id >> 16) & 0xFF;
+                    bytes[2] = (message.id >> 8) & 0xFF;
+                    bytes[3] = message.id & 0xFF;
+                    bytes[4] = message.state ? 1 : 0;
+                    ws.send(bytes);
                 }
-                console.log("Sent all messages");
             }
         }
 
@@ -322,8 +298,7 @@
             
             sendMessages();
 
-            console.log("Set box",id,"To",box.checked,"from index",inx);
-            
+            log("Set box", id, "To", box.checked, "from index", inx);
         }
     </script>
 </body>

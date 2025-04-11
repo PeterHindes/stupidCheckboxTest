@@ -1,4 +1,2 @@
-github.com/PeterHindes/bitarrayutils/fileutils v0.0.0-20240826235957-b1c624b79c83 h1:xP0wzasguEA518P8AdqWTW+3CMG05S0p2vyjJLe00c8=
-github.com/PeterHindes/bitarrayutils/fileutils v0.0.0-20240826235957-b1c624b79c83/go.mod h1:a76RPwuU218nCbnQFxhJmbsbzthDrcK94jVaHlUQ1Zk=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
