@@ -26,10 +26,33 @@ type Settings struct {
 
 // Client connection handling
 type SafeWebSocket struct {
-	conn     *websocket.Conn
-	mutex    sync.Mutex
-	lastSend time.Time
-	id       uint64
+	conn             *websocket.Conn
+	mutex            sync.Mutex
+	lastSend         time.Time
+	id               uint64
+	updateTimes      [3]time.Time // Track last 3 updates for rate limiting
+	updateTimeIdx    int          // Index for circular buffer
+	updateTimesMutex sync.Mutex   // Separate mutex for update times
+}
+
+// Check if a client is within rate limits (3 updates per second)
+func (ws *SafeWebSocket) isWithinRateLimit() bool {
+	ws.updateTimesMutex.Lock()
+	defer ws.updateTimesMutex.Unlock()
+
+	now := time.Now()
+	// Check if any of the last 3 updates was within 1/3 second
+	for _, t := range ws.updateTimes {
+		if !t.IsZero() && now.Sub(t) < 333*time.Millisecond {
+			return false
+		}
+	}
+
+	// Update the circular buffer with current time
+	ws.updateTimes[ws.updateTimeIdx] = now
+	ws.updateTimeIdx = (ws.updateTimeIdx + 1) % 3
+
+	return true
 }
 
 // Update message
@@ -518,6 +541,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	safeConn := &SafeWebSocket{
 		conn: conn,
 		id:   atomic.AddUint64(&clientIdCounter, 1),
+		// Initialize update times as zero times
+		updateTimes: [3]time.Time{},
 	}
 
 	// Register client
@@ -580,6 +605,14 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(message) == 5 && message[0] == 0 {
+			// Only process if within rate limit (3 per second)
+			if !safeConn.isWithinRateLimit() {
+				if isDebugEnabled() {
+					logInfo("Rate limit exceeded for client %d, dropping update", safeConn.id)
+				}
+				continue
+			}
+
 			id := int(message[1])<<16 | int(message[2])<<8 | int(message[3])
 			state := message[4] != 0
 
@@ -590,6 +623,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 				}
 				broadcastChange(safeConn, id, state)
 			}
+		} else if len(message) == 1 && message[0] == 4 {
+			// Handle heartbeat response, nothing to do
 		}
 	}
 }
