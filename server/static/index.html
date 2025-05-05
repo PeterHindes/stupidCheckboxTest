@@ -7,17 +7,28 @@
     <style>
         body {
             margin: 10px;
-            min-width: calc(456px+20px);
+            min-width: 320px; /* Ensure minimum width for mobile devices */
             background-color: rgb(44, 34, 77);
         }
         #flexCenter {
-            min-width: 540px;
+            min-width: 650px;
             display: flex;
             justify-content: center;
         }
+        #rowCounter {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+        }
         #content {
             margin: 0;
-            width: 480px;
+            min-width: calc(var(--checkboxWidth) * 20); /* Ensure it covers the checkboxes */
             background-color: beige;
             padding: 20px;
             border-radius: 10px;
@@ -66,6 +77,7 @@
     </style>
 </head>
 <body>
+    <div id="rowCounter">Rows Scrolled: 0</div>
     <div id="flexCenter">
         <div id="content">
             <div id="clipper">
@@ -77,7 +89,7 @@
         </div>
     </div>
     <script>
-        const DEBUG = true; // Toggle this for production
+        const DEBUG = false; // Toggle this for production
 
         function log(...args) {
             if (DEBUG) {
@@ -105,12 +117,22 @@
             // console.log(rowTop);
             var rowBottom = rowTop + rowHeight;
             rowsScrolled = Math.max(0, Math.floor((window.scrollY - rowTop) / rowHeight));
+            // Calculate maximum possible row
+            var maxPossibleRow = Math.max(0, Math.ceil(boardSize / 20) - totalRows);
+            // Ensure rowsScrolled doesn't exceed maximum possible row
+            rowsScrolled = Math.min(rowsScrolled, maxPossibleRow);
+            // Special handling for bottom rows to prevent glitching
+            if (rowsScrolled >= maxPossibleRow - 1) {
+                // Lock to the exact bottom position
+                rowsScrolled = maxPossibleRow;
+            }
             // set offsetRows in css
             document.documentElement.style.setProperty("--offsetRows", rowsScrolled);
             // set the top row position
             // document.documentElement.style.setProperty("--topRowPos", rowTop + "px");
             // set the counter
             updateCheckBoxes();
+            updateRowCounter(); // Update the row counter on scroll
         }
 
         // window.onscroll = function() {
@@ -186,16 +208,31 @@
 
         // handle updating the checkBoxes in the dom when the user scrolls
         function updateCheckBoxes() {
-            // console.log("Updating checkboxes");
+            // Get the exact row count left in the board from current position
+            const remainingBoxes = Math.max(0, boardSize - (rowsScrolled * 20));
+            const visibleBoxes = Math.min(totalRows * 20, remainingBoxes);
             
-            for (var i = 0; i < totalRows*20; i++) {
+            for (var i = 0; i < totalRows * 20; i++) {
+                var globalIndex = i + rowsScrolled * 20;
                 var box = document.getElementById(`checkbox${i}`);
-                box.checked = checkStates[i + rowsScrolled*20];
-                // console.log("Set box",i,"To",checkStates[i + rowsScrolled*20],"from index",i + rowsScrolled*20);
                 
+                if (!box) continue;
+                
+                // If we're beyond the board size, hide or disable the checkbox
+                if (globalIndex >= boardSize) {
+                    box.disabled = true;
+                    box.style.visibility = "hidden";
+                } else {
+                    box.disabled = false;
+                    box.style.visibility = "visible";
+                    box.checked = checkStates[globalIndex];
+                }
             }
         }
 
+        function updateRowCounter() {
+            document.getElementById("rowCounter").textContent = `Rows Scrolled: ${rowsScrolled}`;
+        }
 
         function getWsUrl() {
             var proto = window.location.protocol
@@ -235,9 +272,13 @@
                     if (data[0] === 1) { // board size message
                         boardSize = (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | data[4];
                         checkStates = new Array(boardSize).fill(false);
-                        // Update total rows for filler
-                        document.documentElement.style.setProperty("--total-rows", Math.ceil(boardSize / 20));
-                        log("Board size set to:", boardSize);
+                        
+                        // Calculate exact number of rows needed for the entire board
+                        const exactRows = Math.ceil(boardSize / 20);
+                        
+                        // Update total rows for filler with exact value
+                        document.documentElement.style.setProperty("--total-rows", exactRows);
+                        log("Board size set to:", boardSize, "Rows:", exactRows);
                         sendMessages();
                     } else if (data[0] === 0) { // checkbox change from another client
                         const id = (data[1] << 16) | (data[2] << 8) | data[3];
@@ -289,10 +330,12 @@
 
         function handleBox(id) {
             var box = document.getElementById(`checkbox${id}`);
-            var inx = id+rowsScrolled*20
-            // console.log(inx,box.checked);
+            var inx = id + rowsScrolled*20;
+            // Prevent accessing beyond array bounds
+            if (inx >= boardSize) {
+                return;
+            }
             checkStates[inx] = box.checked;
-
             // Send the state of the checkbox to the server
             messageQueue.push({id: inx, state: box.checked});
             

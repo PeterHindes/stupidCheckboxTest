@@ -16,7 +16,8 @@ var (
 	numClients        = flag.Int("clients", 1000, "number of concurrent clients")
 	togglesPerClient  = flag.Int("toggles", 10000, "number of toggles per client")
 	toggleInterval    = flag.Duration("interval", 10*time.Millisecond, "interval between toggles")
-	serverAddr        = flag.String("server", "127.0.0.1:1335", "server address")
+	// serverAddr        = flag.String("server", "127.0.0.1:1335", "server address")
+	serverAddr        = flag.String("server", "checkbox.peterhindes.com", "server address")
 	resultsChannel    = make(chan clientResult, 1000)
 	connectionsActive = 0
 	mu                sync.Mutex
@@ -29,11 +30,33 @@ type clientResult struct {
 	errors        int
 }
 
+type clientState struct {
+	lastToggle map[int]time.Time
+	mu         sync.Mutex
+}
+
+func (cs *clientState) canToggle(checkboxId int) bool {
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+
+	now := time.Now()
+	if lastTime, exists := cs.lastToggle[checkboxId]; exists {
+		if now.Sub(lastTime) < 50*time.Millisecond {
+			return false
+		}
+	}
+	cs.lastToggle[checkboxId] = now
+	return true
+}
+
 func runClient(clientID int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	// Create a random source for this client
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano() + int64(clientID)))
+	state := &clientState{
+		lastToggle: make(map[int]time.Time),
+	}
 
 	u := url.URL{Scheme: "ws", Host: *serverAddr, Path: "/ws"}
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -77,9 +100,16 @@ func runClient(clientID int, wg *sync.WaitGroup) {
 
 	for i := 0; i < *togglesPerClient; i++ {
 		// Create toggle message with random checkbox
+		index := rnd.Intn(boardSize)
+
+		// Check rate limit for this checkbox
+		if !state.canToggle(index) {
+			time.Sleep(5 * time.Millisecond)
+			continue
+		}
+
 		msg := make([]byte, 5)
 		msg[0] = 0 // type 0 = checkbox change
-		index := rnd.Intn(boardSize)
 		msg[1] = byte(index >> 16)
 		msg[2] = byte(index >> 8)
 		msg[3] = byte(index)
