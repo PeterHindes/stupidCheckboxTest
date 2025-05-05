@@ -85,9 +85,42 @@
             --total-rows: 0;
         }
 
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            font-size: 24px;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div id="loadingText">Loading...</div>
+    </div>
     <div id="rowCounter">Rows Scrolled: 0</div>
     <div id="userCounter">Active Users: 0</div>
     <div id="flexCenter">
@@ -164,7 +197,7 @@
 
         // Update the checkboxwidth in the css
         var loaded = false;
-        window.onload = async function() {
+        window.onload = function() {
             fillWithBoxes();
 
             // Fill in css vars
@@ -175,16 +208,21 @@
             var checkboxWidth = checkbox1Pos.left - checkbox0Pos.left;
             document.documentElement.style.setProperty("--checkboxWidth", checkboxWidth + "px");
             
-            // Load settings first - must succeed before proceeding
-            const settingsLoaded = await fetchSettings();
-            if (!settingsLoaded) {
-                console.error("Failed to load settings, application may not work correctly");
-            }
-            
-            // Open WebSocket connection after loading settings
-            openWebsocket();
-
-            loaded = true;
+            // Start fetching settings and opening WebSocket in parallel
+            Promise.all([
+                fetchSettings(),
+                new Promise(resolve => {
+                    // Start WebSocket connection right away
+                    openWebsocket(() => resolve(true));
+                })
+            ]).then(() => {
+                // Hide loading overlay when both are complete
+                document.getElementById('loadingOverlay').style.display = 'none';
+                loaded = true;
+            }).catch(err => {
+                console.error("Error during initialization:", err);
+                document.getElementById('loadingText').innerText = 'Error loading. Try refreshing.';
+            });
         }
         window.onresize = function() {
             fillWithBoxes();
@@ -226,6 +264,7 @@
 
         // Fetch settings before connecting to WebSocket
         async function fetchSettings() {
+            document.getElementById('loadingText').innerText = 'Loading settings...';
             try {
                 const response = await fetch('settings.json');
                 const settings = await response.json();
@@ -304,17 +343,21 @@
         var activeUsers = 0;
         var lastHeartbeat = Date.now();
         
-        function openWebsocket() {
+        // Modified to accept a callback for when the connection is established
+        function openWebsocket(callback) {
             log("Opening websocket");
+            document.getElementById('loadingText').innerText = 'Connecting to server...';
             
             if (ws === null || ws.readyState === 3) {
                 ws = new WebSocket(wsurl);
                 ws.binaryType = "arraybuffer";
                 ws.onopen = function() {
                     log("Websocket opened");
+                    document.getElementById('loadingText').innerText = 'Connected, receiving data...';
                     sendMessages(); // Send any queued messages immediately
                     // Start heartbeat
                     startHeartbeat();
+                    if (callback) callback();
                 }
                 ws.onmessage = function(event) {
                     const data = new Uint8Array(event.data);
@@ -346,26 +389,53 @@
                         }
                         log("Received and responded to heartbeat");
                     } else { // full board state
-                        for (let i = 0; i < data.length; i++) {
-                            for (let j = 0; j < 8; j++) {
-                                const inx = i*8 + j;
-                                if (inx < boardSize) {
-                                    checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
+                        document.getElementById('loadingText').innerText = 'Processing board state...';
+                        
+                        // Process board state in chunks for better performance
+                        setTimeout(() => {
+                            const chunkSize = 5000; // Process 5000 bytes at a time
+                            let i = 0;
+                            
+                            function processNextChunk() {
+                                const endIndex = Math.min(i + chunkSize, data.length);
+                                for (; i < endIndex; i++) {
+                                    for (let j = 0; j < 8; j++) {
+                                        const inx = i*8 + j;
+                                        if (inx < boardSize) {
+                                            checkStates[inx] = (data[i] & (1 << (7 - j))) !== 0;
+                                        }
+                                    }
+                                }
+                                
+                                // If we processed less than the whole chunk, we're done
+                                if (i < data.length) {
+                                    document.getElementById('loadingText').innerText = 
+                                        `Processing board state... ${Math.floor((i / data.length) * 100)}%`;
+                                    setTimeout(processNextChunk, 0);
+                                } else {
+                                    updateCheckBoxes();
+                                    log("Received full board update");
                                 }
                             }
-                        }
-                        updateCheckBoxes();
-                        log("Received full board update");
+                            
+                            processNextChunk();
+                        }, 0);
                     }
                 }
                 ws.onclose = function() {
                     log("Websocket closed");
-                    setTimeout(openWebsocket, 1000);
+                    setTimeout(() => openWebsocket(), 1000);
+                }
+                ws.onerror = function(error) {
+                    log("WebSocket error:", error);
+                    document.getElementById('loadingText').innerText = 'Connection error, retrying...';
                 }
             } else if (ws.readyState === 0) {
                 log("Websocket not open yet");
+                if (callback) setTimeout(callback, 500);
             } else if (ws.readyState === 1) {
                 log("Websocket already open");
+                if (callback) callback();
             }
         }
 
