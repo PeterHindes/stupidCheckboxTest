@@ -26,6 +26,17 @@
             font-size: 14px;
             z-index: 1000;
         }
+        #userCounter {
+            position: fixed;
+            top: 40px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+        }
         #content {
             margin: 0;
             min-width: calc(var(--checkboxWidth) * 20); /* Ensure it covers the checkboxes */
@@ -78,6 +89,7 @@
 </head>
 <body>
     <div id="rowCounter">Rows Scrolled: 0</div>
+    <div id="userCounter">Active Users: 0</div>
     <div id="flexCenter">
         <div id="content">
             <div id="clipper">
@@ -152,8 +164,7 @@
 
         // Update the checkboxwidth in the css
         var loaded = false;
-        window.onload = function() {
-
+        window.onload = async function() {
             fillWithBoxes();
 
             // Fill in css vars
@@ -164,6 +175,13 @@
             var checkboxWidth = checkbox1Pos.left - checkbox0Pos.left;
             document.documentElement.style.setProperty("--checkboxWidth", checkboxWidth + "px");
             
+            // Load settings first - must succeed before proceeding
+            const settingsLoaded = await fetchSettings();
+            if (!settingsLoaded) {
+                console.error("Failed to load settings, application may not work correctly");
+            }
+            
+            // Open WebSocket connection after loading settings
             openWebsocket();
 
             loaded = true;
@@ -205,6 +223,32 @@
         // store the boolean state of all checkboxes (size will be set when connecting)
         var checkStates = [];
         var boardSize = 0;
+
+        // Fetch settings before connecting to WebSocket
+        async function fetchSettings() {
+            try {
+                const response = await fetch('settings.json');
+                const settings = await response.json();
+                if (settings && settings.boardSize) {
+                    boardSize = settings.boardSize;
+                    checkStates = new Array(boardSize).fill(false);
+                    
+                    // Calculate exact number of rows needed for the entire board
+                    const exactRows = Math.ceil(boardSize / 20);
+                    
+                    // Update total rows for filler with exact value
+                    document.documentElement.style.setProperty("--total-rows", exactRows);
+                    log("Board size set from settings:", boardSize, "Rows:", exactRows);
+                    return true;
+                }
+                alert("Error: Invalid settings.json file (missing boardSize)");
+                return false;
+            } catch (error) {
+                log("Error fetching settings:", error);
+                alert("Error loading settings.json. The application may not work correctly.");
+                return false;
+            }
+        }
 
         // handle updating the checkBoxes in the dom when the user scrolls
         function updateCheckBoxes() {
@@ -256,6 +300,10 @@
             saveMessageQueue();
         });
         // retry should be a callback function to rerun after the websocket is opened
+        // Variables for active user tracking
+        var activeUsers = 0;
+        var lastHeartbeat = Date.now();
+        
         function openWebsocket() {
             log("Opening websocket");
             
@@ -264,22 +312,17 @@
                 ws.binaryType = "arraybuffer";
                 ws.onopen = function() {
                     log("Websocket opened");
-                    // Initial state will be sent by server
+                    sendMessages(); // Send any queued messages immediately
+                    // Start heartbeat
+                    startHeartbeat();
                 }
                 ws.onmessage = function(event) {
                     const data = new Uint8Array(event.data);
                     
-                    if (data[0] === 1) { // board size message
-                        boardSize = (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | data[4];
-                        checkStates = new Array(boardSize).fill(false);
-                        
-                        // Calculate exact number of rows needed for the entire board
-                        const exactRows = Math.ceil(boardSize / 20);
-                        
-                        // Update total rows for filler with exact value
-                        document.documentElement.style.setProperty("--total-rows", exactRows);
-                        log("Board size set to:", boardSize, "Rows:", exactRows);
-                        sendMessages();
+                    if (data[0] === 1) { // board size message - ignore, we already have it from settings
+                        // No need to process - we already have board size from settings.json
+                        log("Received board size message from server:", 
+                            (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | data[4]);
                     } else if (data[0] === 0) { // checkbox change from another client
                         const id = (data[1] << 16) | (data[2] << 8) | data[3];
                         const state = data[4] !== 0;
@@ -288,6 +331,20 @@
                             updateCheckBoxes();
                             log("Received forwarded change:", { id, state });
                         }
+                    } else if (data[0] === 2) { // active user count message
+                        // Extract user count from bytes 1-4
+                        activeUsers = (data[1] << 24) | (data[2] << 16) | (data[3] << 8) | data[4];
+                        updateUserCounter();
+                        log("Received active user count:", activeUsers);
+                        // Reset heartbeat timestamp
+                        lastHeartbeat = Date.now();
+                    } else if (data[0] === 3) { // heartbeat ping
+                        // Send heartbeat response
+                        const heartbeatResponse = new Uint8Array([4]); // Type 4 = heartbeat response
+                        if (ws.readyState === 1) {
+                            ws.send(heartbeatResponse);
+                        }
+                        log("Received and responded to heartbeat");
                     } else { // full board state
                         for (let i = 0; i < data.length; i++) {
                             for (let j = 0; j < 8; j++) {
@@ -310,6 +367,23 @@
             } else if (ws.readyState === 1) {
                 log("Websocket already open");
             }
+        }
+
+        function updateUserCounter() {
+            document.getElementById("userCounter").textContent = `Active Users: ${activeUsers}`;
+        }
+        
+        function startHeartbeat() {
+            // Check every 30 seconds if we've received a heartbeat in the last minute
+            setInterval(function() {
+                const now = Date.now();
+                if (now - lastHeartbeat > 60000) { // If no heartbeat for 60 seconds
+                    log("No heartbeat received for 60 seconds, reconnecting...");
+                    if (ws) {
+                        ws.close();
+                    }
+                }
+            }, 30000);
         }
 
         function sendMessages() {

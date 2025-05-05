@@ -4,4 +4,4 @@
 benchmark/benchmark
 .DS_Store
 server/checkboxserver
-# server/bitArray.bin
+server/bitArray.bin

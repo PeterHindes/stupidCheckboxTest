@@ -306,27 +306,25 @@ func isDebugEnabled() bool {
 
 // Load settings from file
 func loadSettings() error {
-	data, err := os.ReadFile("settings.json")
+	// Try reading from static folder first
+	data, err := os.ReadFile("static/settings.json")
 	if err != nil {
-		if os.IsNotExist(err) {
-			defaultSettings := Settings{BoardSize: 1000000}
-			data, err := json.MarshalIndent(defaultSettings, "", "    ")
-			if err != nil {
-				return fmt.Errorf("error creating default settings: %v", err)
+		// Fallback to legacy location
+		data, err = os.ReadFile("settings.json")
+		if err != nil {
+			if os.IsNotExist(err) {
+				// Don't start if settings file is missing
+				return fmt.Errorf("settings file not found in static/settings.json or settings.json")
 			}
-			if err := os.WriteFile("settings.json", data, 0644); err != nil {
-				return fmt.Errorf("error writing default settings: %v", err)
-			}
-			return nil
+			return fmt.Errorf("error reading settings: %v", err)
 		}
-		return fmt.Errorf("error reading settings: %v", err)
 	}
 
 	if err := json.Unmarshal(data, &settings); err != nil {
 		return fmt.Errorf("error parsing settings: %v", err)
 	}
 
-	// Initialize bitArray
+	// Initialize bitArray with configured size
 	bitArray = make([]bool, settings.BoardSize)
 	return nil
 }
@@ -424,6 +422,85 @@ func broadcastToAll() {
 	wg.Wait()
 
 	// Remove failed clients
+	for _, client := range clientsToRemove {
+		removeClient(client)
+	}
+}
+
+// Broadcast active user count to all clients
+func broadcastActiveUserCount() {
+	count := int(atomic.LoadInt32(&activeConn))
+	logInfo("Broadcasting active user count: %d", count)
+
+	// Create message with type 2 (active user count)
+	msg := make([]byte, 5)
+	msg[0] = 2 // type 2 = active user count
+	msg[1] = byte(count >> 24)
+	msg[2] = byte(count >> 16)
+	msg[3] = byte(count >> 8)
+	msg[4] = byte(count)
+
+	clientsMutex.RLock()
+	activeClients := make([]*SafeWebSocket, 0, len(clients))
+	for client := range clients {
+		activeClients = append(activeClients, client)
+	}
+	clientsMutex.RUnlock()
+
+	// Send to all clients
+	for _, client := range activeClients {
+		if client == nil || client.conn == nil {
+			continue
+		}
+
+		client.mutex.Lock()
+		client.conn.SetWriteDeadline(time.Now().Add(writeTimeout))
+		err := client.conn.WriteMessage(websocket.BinaryMessage, msg)
+		client.conn.SetWriteDeadline(time.Time{})
+		client.mutex.Unlock()
+
+		if err != nil {
+			go removeClient(client)
+		}
+	}
+}
+
+// Send heartbeat ping to check if clients are still connected
+func sendHeartbeatPing() {
+	// Create message with type 3 (heartbeat ping)
+	msg := []byte{3} // type 3 = heartbeat ping
+
+	clientsMutex.RLock()
+	activeClients := make([]*SafeWebSocket, 0, len(clients))
+	for client := range clients {
+		activeClients = append(activeClients, client)
+	}
+	clientsMutex.RUnlock()
+
+	var clientsToRemove []*SafeWebSocket
+
+	// Send to all clients
+	for _, client := range activeClients {
+		if client == nil || client.conn == nil {
+			clientsToRemove = append(clientsToRemove, client)
+			continue
+		}
+
+		if !client.mutex.TryLock() {
+			continue
+		}
+
+		client.conn.SetWriteDeadline(time.Now().Add(writeTimeout))
+		err := client.conn.WriteMessage(websocket.BinaryMessage, msg)
+		client.conn.SetWriteDeadline(time.Time{})
+		client.mutex.Unlock()
+
+		if err != nil {
+			clientsToRemove = append(clientsToRemove, client)
+		}
+	}
+
+	// Remove unresponsive clients
 	for _, client := range clientsToRemove {
 		removeClient(client)
 	}
@@ -539,14 +616,14 @@ func removeClient(client *SafeWebSocket) {
 			}()
 
 			conn.SetWriteDeadline(time.Now().Add(time.Second))
-			conn.WriteMessage(websocket.CloseMessage, 
+			conn.WriteMessage(websocket.CloseMessage,
 				websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			conn.Close()
 		}
 
 		delete(clients, client)
 		atomic.AddInt32(&activeConn, -1)
-		
+
 		if isDebugEnabled() {
 			logInfo("Client %d disconnected. Total clients: %d", client.id, len(clients))
 		}
@@ -637,20 +714,28 @@ func main() {
 		IdleTimeout:       120 * time.Second,
 	}
 
-	// Start periodic save and stats reporting
+	// Start periodic save, heartbeat, and stats reporting
 	go func() {
-		ticker := time.NewTicker(10 * time.Second)
-		defer ticker.Stop()
+		saveAndBroadcastTicker := time.NewTicker(10 * time.Second)
+		userCountTicker := time.NewTicker(5 * time.Second)
+		heartbeatTicker := time.NewTicker(30 * time.Second)
+		defer saveAndBroadcastTicker.Stop()
+		defer userCountTicker.Stop()
+		defer heartbeatTicker.Stop()
 
 		for {
 			select {
-			case <-ticker.C:
+			case <-saveAndBroadcastTicker.C:
 				saveToDisk()
 				conns := atomic.LoadInt32(&activeConn)
 				logInfo("Active connections: %d", conns)
 				if conns > 0 {
 					broadcastToAll()
 				}
+			case <-userCountTicker.C:
+				broadcastActiveUserCount()
+			case <-heartbeatTicker.C:
+				sendHeartbeatPing()
 			case <-ctx.Done():
 				return
 			}
@@ -665,7 +750,7 @@ func main() {
 	go func() {
 		logInfo("Server starting on %s", *listenAddr)
 		logInfo("Board size: %d", settings.BoardSize)
-		logInfo("Batch interval: %v, Batch size: %d, Processors: %d", 
+		logInfo("Batch interval: %v, Batch size: %d, Processors: %d",
 			*batchInterval, *batchSize, *numProcessors)
 
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
